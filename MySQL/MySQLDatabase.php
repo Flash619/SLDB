@@ -17,7 +17,7 @@ class MySQLDatabase extends Database{
 	*/
 	function __construct(){
 		$this->_CONFIGURED = false;
-		$this->_DATABASE_TYPE = NULL;
+		$this->_DATABASE_TYPE = 'MySQL';
 	}
 
 	/**
@@ -29,21 +29,61 @@ class MySQLDatabase extends Database{
 
 	function select(array $query=array()){
 
+		//Validation takes place in the object itself.
+		$query = new MySQLQuery('select',$query);
+		if( $query->run() ){
+			return $query->getResult();
+		}else{
+			return array();
+		}
+		
 	}
 
 	function insert(array $query=array()){
+
+		//Validation takes place in the object itself.
+		$query = new MySQLQuery('select',$query);
+		if( $query->run() ){
+			return $query->getResult();
+		}else{
+			return array();
+		}
 		
 	}
 
 	function create(array $query=array()){
+
+		//Validation takes place in the object itself.
+		$query = new MySQLQuery('select',$query);
+		if( $query->run() ){
+			return $query->getResult();
+		}else{
+			return array();
+		}
 		
 	}
 
 	function delete(array $query=array()){
+
+		//Validation takes place in the object itself.
+		$query = new MySQLQuery('select',$query);
+		if( $query->run() ){
+			return $query->getResult();
+		}else{
+			return array();
+		}
 		
 	}
 
 	function drop(array $query=array()){
+
+		//Validation takes place in the object itself.
+		$query = new MySQLQuery('select',$query);
+		if( $query->run() ){
+			return $query->getResult();
+		}else{
+			return array();
+		}
 		
 	}
 

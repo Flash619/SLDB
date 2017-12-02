@@ -2,20 +2,14 @@
 
 namespace SLDB\MySQL;
 
-use SLDB\MySQL\MySQLCreateQuery;
-use SLDB\MySQL\MySQLDatabase;
-use SLDB\MySQL\MySQLDeleteQuery;
-use SLDB\MySQL\MySQLDropQuery;
-use SLDB\MySQL\MySQLInsertQuery;
-use SLDB\MySQL\MySQLSelectQuery;
-use SLDB\MySQL\MySQLUpdateQuery;
+use SLDB\Base\Query;
 
 /**
 * This is the MySQLQuery base class used for and inherited by all other MySQL Query classes.
 * @author Travis Truttschel
 * @since 1.0.0
 */
-class MySQLQuery{
+class MySQLQuery extends Query{
 
 	//This class has no real configuration as configurable items
 	//are passed during the function call and are stored temporarily
@@ -24,7 +18,10 @@ class MySQLQuery{
 	/**
 	* Class Constructor
 	*/
-	function __construct(){
+	function __construct(string $type,array $query){
+
+		//Type setting & validation take place in the parent class.
+		Query::__construct($type,$query);
 
 	}
 

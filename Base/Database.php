@@ -13,17 +13,17 @@ class Database{
 	/**
 	* Whether this database is configed and ready.
 	*/
-	private $_CONFIGURED;
+	protected $_CONFIGURED;
 
 	/**
 	* What type of database this is.
 	*/
-	private $_DATABASE_TYPE;
+	protected $_DATABASE_TYPE;
 
 	/**
 	* The last known error recieved from the database engine in PHP
 	*/
-	private $_LAST_ERROR;
+	protected $_LAST_ERROR;
 
 	/**
 	* Class Constructor
@@ -47,7 +47,8 @@ class Database{
 	* @since 1.0.0
 	* @return boolean
 	*/
-	function isConfigured(){ 		return $this->$_CONFIGURED; 
+	function isConfigured(){ 		
+		return $this->$_CONFIGURED; 
 	}
 
 	/**
@@ -63,8 +64,9 @@ class Database{
 	}
 
 	function select(array $query=array()){
- 
 
+	}
+ 
 	function insert(array $query=array()){
 		
 	}
