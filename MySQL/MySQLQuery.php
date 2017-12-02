@@ -1,6 +1,6 @@
 <?php
 
-namespace SLDB;
+namespace SLDB\MySQL;
 
 use SLDB\MySQL\MySQLCreateQuery;
 use SLDB\MySQL\MySQLDatabase;

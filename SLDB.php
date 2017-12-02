@@ -12,6 +12,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 namespace SLDB;
 
+use SLDB\Base\Database;
 use SLDB\MySQL\MySQLDatabase;
 
 /**
@@ -43,7 +44,7 @@ class SLDB{
 	/**
 	* An array of required configuration parameters for SLDB
 	*/
-	private $_REQIORED_CONFIG_PARAMS;
+	private $_REQUIRED_CONFIG_PARAMS;
 
 	/**
 	* The active database object used for queries
@@ -58,18 +59,14 @@ class SLDB{
 		//Define member variables
 		$this->_CONFIGURED   =   NULL;
 		$this->_CONFIG       =   array();
-		$this->_VALID_CONFIG_PARAMS = array(
+		$params = array(
 			'database_type',
 			'database_name',
 			'database_host',
 			'database_username',
 			'database_password');
-		$this->_REQIORED_CONFIG_PARAMS = array(
-			'database_type',
-			'database_name',
-			'database_host',
-			'database_username',
-			'database_password');
+		$this->_VALID_CONFIG_PARAMS = $params;
+		$this->_REQUIRED_CONFIG_PARAMS = $params;
 		$this->_DATABASE     =   NULL;
 
 		//Setup SLDB if a config is supplied
@@ -97,62 +94,39 @@ class SLDB{
 	* @param array
 	* @throws InvalidConfigurationOptionException InvalidConfigurationValueException InvalidConfigurationExceiption
 	*/
-	function setConfig(array $config=array()){
-
-		//Ignore empty arrays.
-		if(empty($config)){
-			return;
-		}
+	private function setConfig(array $config){
 
 		// --------------------------------------------------
 		// Verify profided configuration validity
 		// --------------------------------------------------
 
+		$matchedParams = array();
+
 		//Loop through all $config as $k (key) $v (value)
 		foreach($config as $k => $v){
 
-			$valid = false;
+			//IF $k exists within _REQUIRED_CONFIG_PARAMS
+			if(in_array($k, $this->_REQUIRED_CONFIG_PARAMS)){
 
-			//Loop through all $_VALID_CONFIG_PARAMS as $p (value)
-			foreach($_VALID_CONFIG_PARAMS as $p){
-
-				//IF $k == $p then this parameter key is valid
-				if($k == $p &&){
-
-					//IF $v is empty AND $k does not exist in _REQIORED_CONFIG_PARAMS
-					if(empty($v) && !array_key_exists($k, $this->_REQIORED_CONFIG_PARAMS)){
-
-						//The value of this config array key is not valid
-						throw new InvalidConfigurationValueException();
-
-					}else{
-
-						//This configuration key is valid
-						$valid = true;
-
-					}
-
+				//IF $v is not set or null.
+				if(empty($v)){
+					throw new InvalidConfigurationValueException();
+				}else{
+					$matchedParams[] = $k;
 				}
 
 			}
 
-			if(!$valid){
+			//IF $k does not exist within _VALID_CONFIG_PARAMS
+			if(!in_array($k, $this->_VALID_CONFIG_PARAMS)){
 				throw new InvalidConfigurationOptionException();
 			}
 
 		}
 
-		//Loop through all _REQIORED_CONFIG_PARAMS as $p (value)
-		foreach($_REQIORED_CONFIG_PARAMS as $p){
-
-			//IF $p does not exist in $config.
-			if(! array_key_exists($p, $config)){
-
-				//A required configuraation field is missing
-				throw new InvalidConfigurationException();
-
-			}
-
+		//IF $matchedParams does not equal _REQUIRED_CONFIG_PARAMS
+		if($matchedParams != $this->_REQUIRED_CONFIG_PARAMS){
+			throw new InvalidConfigurationException();
 		}
 
 		// --------------------------------------------------
@@ -165,40 +139,21 @@ class SLDB{
 	}
 
 	/**
-	* Sets up all member objects based on the configuration supplied.
+	* Sets up all member objects based on the configuration stored within SLDB.
 	* @author Travis Truttschel
 	* @since 1.0.0
 	* @throws InvalidConfigurationException InvalidDatabaseTypeException
 	*/
-	protected function initializeConfig(){
-
-		//IF _CONFIG is empty
-		if(empty($this->_CONFIG)){
-
-			//Invalid configuration is present
-			throw new InvalidConfigurationException();
-
-		}
+	private function initializeConfig(){
 
 		//Initialize based on database type
 		switch(strtolower($this->_CONFIG['database_type'])){
 			case 'mysql':
-				$this->initializeMySQL();
+				$this->_DATABASE = new MySQLDatabase();
 				break;
 			default:
 				throw new InvalidDatabaseTypeException();
 		}
-
-	}
-
-	/**
-	* Sets up all member objects based for a MySQL type database. Called by initializeConfig.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	*/
-	protected function initializeMySQL(){
-
-		$this->_DATABASE = new MySQLDatabase();
 
 	}
 

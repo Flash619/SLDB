@@ -1,5 +1,5 @@
 <?php
-namespace SLDB;
+namespace SLDB\Base;
 
 /**
 * This Database class is inherited by other Database class types and is used for general abstraction. This is more
@@ -21,11 +21,17 @@ class Database{
 	private $_DATABASE_TYPE;
 
 	/**
+	* The last known error recieved from the database engine in PHP
+	*/
+	private $_LAST_ERROR;
+
+	/**
 	* Class Constructor
 	*/
 	function __construct(){
-		$this->_CONFIGURED = false;
+		$this->_CONFIGURED    = false;
 		$this->_DATABASE_TYPE = NULL;
+		$this->_LAST_ERROR    = NULL;
 	}
 
 	/**
@@ -41,10 +47,7 @@ class Database{
 	* @since 1.0.0
 	* @return boolean
 	*/
-	function isConfigured(){
-
-		return $this->$_CONFIGURED;
-
+	function isConfigured(){ 		return $this->$_CONFIGURED; 
 	}
 
 	/**
@@ -57,6 +60,25 @@ class Database{
 
 		return $this->$_DATABASE_TYPE;
 
+	}
+
+	function select(array $query=array()){
+ 
+
+	function insert(array $query=array()){
+		
+	}
+
+	function create(array $query=array()){
+		
+	}
+
+	function delete(array $query=array()){
+		
+	}
+
+	function drop(array $query=array()){
+		
 	}
 
 }

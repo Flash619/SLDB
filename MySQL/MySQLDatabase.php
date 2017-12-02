@@ -1,6 +1,6 @@
 <?php
 
-namespace SLDB;
+namespace SLDB\MySQL;
 
 use SLDB\Base\Database;
 use SLDB\MySQL\MySQLQuery;
@@ -25,6 +25,26 @@ class MySQLDatabase extends Database{
 	*/
 	function __destruct(){
 
+	}
+
+	function select(array $query=array()){
+
+	}
+
+	function insert(array $query=array()){
+		
+	}
+
+	function create(array $query=array()){
+		
+	}
+
+	function delete(array $query=array()){
+		
+	}
+
+	function drop(array $query=array()){
+		
 	}
 
 }
