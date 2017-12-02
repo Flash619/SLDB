@@ -4,6 +4,12 @@ namespace SLDB\MySQL;
 
 use SLDB\Base\Database;
 use SLDB\MySQL\MySQLQuery;
+use SLDB\MySQL\MySQLSelectQuery;
+use SLDB\MySQL\MySQLInsertQuery;
+use SLDB\MySQL\MySQLCreateQuery;
+use SLDB\MySQL\MySQLDeleteQuery;
+use SLDB\MySQL\MySQLDropQuery;
+
 
 /**
 * This is the MySQLDatabase class used for all MySQL Database activities.
@@ -27,63 +33,43 @@ class MySQLDatabase extends Database{
 
 	}
 
-	function select(array $query=array()){
+	function select(string $table,array $columns,array $where,integer $limit=0){
 
 		//Validation takes place in the object itself.
-		$query = new MySQLQuery('select',$query);
-		if( $query->run() ){
-			return $query->getResult();
-		}else{
-			return array();
-		}
+		$query = new MySQLSelectQuery($table,$columns,$where,$limit);
+
+		//TODO Running & Post Validation
+
+
+	}
+
+	function insert(string $table,array $row){
+
+		//Validation takes place in the object itself.
+		$query = new MySQLInsertQuery($table,$row);
+		
+		//TODO Running & Post Validation
 		
 	}
 
-	function insert(array $query=array()){
+	function create(){
 
-		//Validation takes place in the object itself.
-		$query = new MySQLQuery('select',$query);
-		if( $query->run() ){
-			return $query->getResult();
-		}else{
-			return array();
-		}
+		//NOT YET IMPLEMENTED
 		
 	}
 
-	function create(array $query=array()){
+	function delete(string $table,array $where,integer $limit=0){
 
 		//Validation takes place in the object itself.
-		$query = new MySQLQuery('select',$query);
-		if( $query->run() ){
-			return $query->getResult();
-		}else{
-			return array();
-		}
+		$query = new MySQLDeleteQuery($table,$where,$limit);
 		
-	}
-
-	function delete(array $query=array()){
-
-		//Validation takes place in the object itself.
-		$query = new MySQLQuery('select',$query);
-		if( $query->run() ){
-			return $query->getResult();
-		}else{
-			return array();
-		}
+		//TODO Running & Post Validation
 		
 	}
 
 	function drop(array $query=array()){
 
-		//Validation takes place in the object itself.
-		$query = new MySQLQuery('select',$query);
-		if( $query->run() ){
-			return $query->getResult();
-		}else{
-			return array();
-		}
+		//NOT YET IMPLEMENTED
 		
 	}
 

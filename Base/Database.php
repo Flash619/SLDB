@@ -63,24 +63,24 @@ class Database{
 
 	}
 
-	function select(array $query=array()){
+	function select(string $table,array $columns,array $where,integer $limit=0){
 
 	}
  
-	function insert(array $query=array()){
+	function insert($table,$row){
 		
 	}
 
-	function create(array $query=array()){
-		
+	function create(){
+		//Not yet implemented
 	}
 
-	function delete(array $query=array()){
+	function delete($table,$where,integer $limit=0){
 		
 	}
 
 	function drop(array $query=array()){
-		
+		//Not yet implemented
 	}
 
 }

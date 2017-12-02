@@ -9,48 +9,34 @@ namespace SLDB\Base;
 class Query{
 
 	/**
-	* Current query type
+	* Current stored query string
 	*/
-	private $_QUERY_TYPE;
+	protected $_QUERY;
 
 	/**
-	* Known query types
+	* Last stored query error
 	*/
-	private $_QUERY_TYPES;
+	protected $_ERROR;
 
 	/**
-	* Current stored query array;
+	* Stored result rows
 	*/
-	private $_QUERY;
+	protected $_ROWS;
+
+	/**
+	* Total affected rows from last query
+	*/
+	protected $_ROWS_AFFECTED;
 
 	/**
 	* Class Constructor
 	*/
-	function __construct(string $type,array $query){
+	function __construct(){
 
-		//Set known query types
-		$_QUERY_TYPES = array(
-			'select',
-			'insert',
-			'update',
-			'create',
-			'drop',
-			'delete',
-		);
-
-		//Validate query type
-		if(! in_array($type,$this->_QUERY_TYPES)){
-			throw new InvalidQueryTypeException();
-		}
-
-		$this->_QUERY_TYPE = $type;
-
-		//Validate query
-		if(!$this->validateQuery($query)){
-			throw new InvalidQueryException();
-		}
-
-		$this->_QUERY = $query;
+		$this->$_ERROR          =  NULL;
+		$this->$_QUERY          =  NULL;
+		$this->$_ROWS           =  NULL;
+		$this->$_ROWS_AFFECTED  =  NULL;
 
 	}
 
@@ -69,71 +55,7 @@ class Query{
 	* @param array
 	* @return boolean
 	*/
-	protected function validateQuery(array $query){
-
-		switch($this->$_QUERY_TYPE){
-
-			//--------------------------
-			//SELECT query validation
-			//--------------------------
-
-			case 'select':
-				if(!$this->noEmptyValues($query)){ return false; }
-				//First value is table name, Second value is fields, Third value is selectors.
-				//OPTIONAL Fourth value is limit.
-				if(!is_string($query[0]) || !is_array($query[1]) || is_array($query[2])){ return false; }
-				return true;
-
-			//--------------------------
-			//INSERT query validation
-			//--------------------------
-
-			case 'insert':
-				//First value is table name, Second value is field/value pairs.
-				if(!is_string($query[0]) || !is_array($query[1])){ return false; }
-				return true;
-
-			//--------------------------
-			//UPDATE query validation
-			//--------------------------
-
-			case 'update':
-				//First value is table name, Second value is fields/value pairs, Third value is field/value pairs.
-				//OPTIONAL Fourth value is limit.
-				if(!is_string($query[0]) || !is_array($query[1]) || !is_array($query[2])){ return false; }
-				return true;
-
-			//--------------------------
-			//CREATE query validation
-			//--------------------------
-
-			case 'create':
-				//TODO this type of query is not yet supported.
-				throw new InvalidQueryTypeException();
-				return true;
-
-			//--------------------------
-			//DROP query validation
-			//--------------------------
-
-			case 'drop':
-				//TODO this type of query is not yet supported.
-				throw new InvalidQueryTypeException();
-				return true;
-
-			//--------------------------
-			//DELETE query validation
-			//--------------------------
-
-			case 'delete':
-				//First value is table name, Second value is fields/value pairs.
-				//OPTIONAL Fourth value is limit.
-				if(!is_string($query[0]) || !is_array($query[1])){ return false; }
-				return true;
-			default: return false;
-		}
-
-	}
+	protected function validateQuery(array $query){}
 
 	/**
 	* Checks to see if an array has any empty values. This function can call itself if it finds
@@ -159,6 +81,55 @@ class Query{
 
 		return true;
 
+	}
+
+	/**
+	* Runs the supplied query and returns true on success, false on failure.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @return boolean
+	*/
+	function run(){}
+
+
+	/**
+	* Returns the previous database error.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @return string || NULL
+	*/
+	function getError(){
+		return $this->_ERROR;
+	}
+
+	/**
+	* Returns the resulting rows from a select query.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @return array || NULL
+	*/
+	function getRows(){
+		return $this->_ROWS;
+	}
+
+	/**
+	* Returns total number of rows affected by the last query.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @return integer || NULL
+	*/
+	function getRowsAffected(){
+		return $this->_ROWS_AFFECTED;
+	}
+
+	/**
+	* Returns the formatted raw query syntax for this query.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @return string || NULL
+	*/
+	function getQuerySyntax(){
+		return $this->_QUERY;
 	}
 
 }

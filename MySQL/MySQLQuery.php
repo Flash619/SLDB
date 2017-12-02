@@ -20,8 +20,7 @@ class MySQLQuery extends Query{
 	*/
 	function __construct(string $type,array $query){
 
-		//Type setting & validation take place in the parent class.
-		Query::__construct($type,$query);
+		Query::__construct();
 
 	}
 
