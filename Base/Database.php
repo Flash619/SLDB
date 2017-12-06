@@ -4,11 +4,15 @@ namespace SLDB\Base;
 /**
 * This Database class is inherited by other Database class types and is used for general abstraction. This is more
 * useful for someone who may be loading multiple databases with SLDB at once, or checking to see if a variable is
-* a valid SLDB database. 
+* a valid SLDB database object type. 
 * @author Travis Truttschel
 * @since 1.0.0
 */
 class Database{
+
+	//---------------------------------------------------------------
+	// Protected member variables.
+	//---------------------------------------------------------------
 
 	/**
 	* Whether this database is configed and ready.
@@ -37,9 +41,26 @@ class Database{
 	/**
 	* Class Destructor
 	*/
-	function __destruct(){
+	function __destruct(){}
 
-	}
+	//---------------------------------------------------------------
+	// Standard functions to be overidden per query child class.
+	//---------------------------------------------------------------
+
+	function select(array $columns,string $table,array $where,integer $limit=NULL){}
+ 
+	function insert(string $table,array $row){}
+
+	function create(){}
+
+	function delete(string $table,array $where,integer $limit=NULL){}
+
+	function drop(array $query){}
+
+
+	//---------------------------------------------------------------
+	// Predefined functions used by query child classes.
+	//---------------------------------------------------------------	
 
 	/**
 	* Returns whether this database has been configured.
@@ -61,26 +82,6 @@ class Database{
 
 		return $this->$_DATABASE_TYPE;
 
-	}
-
-	function select(string $table,array $columns,array $where,integer $limit=0){
-
-	}
- 
-	function insert($table,$row){
-		
-	}
-
-	function create(){
-		//Not yet implemented
-	}
-
-	function delete($table,$where,integer $limit=0){
-		
-	}
-
-	function drop(array $query=array()){
-		//Not yet implemented
 	}
 
 }

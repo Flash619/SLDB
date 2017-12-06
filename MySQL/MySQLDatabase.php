@@ -3,7 +3,6 @@
 namespace SLDB\MySQL;
 
 use SLDB\Base\Database;
-use SLDB\MySQL\MySQLQuery;
 use SLDB\MySQL\MySQLSelectQuery;
 use SLDB\MySQL\MySQLInsertQuery;
 use SLDB\MySQL\MySQLCreateQuery;
@@ -29,14 +28,16 @@ class MySQLDatabase extends Database{
 	/**
 	* Class Destructor
 	*/
-	function __destruct(){
+	function __destruct(){}
 
-	}
-
-	function select(string $table,array $columns,array $where,integer $limit=0){
+	function select(array $columns,string $table,array $where,integer $limit=NULL){
 
 		//Validation takes place in the object itself.
-		$query = new MySQLSelectQuery($table,$columns,$where,$limit);
+		$query = new MySQLSelectQuery($columns,$table,$where,$limit);
+
+		if(!$query->commit()){
+
+		}
 
 		//TODO Running & Post Validation
 
@@ -58,7 +59,7 @@ class MySQLDatabase extends Database{
 		
 	}
 
-	function delete(string $table,array $where,integer $limit=0){
+	function delete(string $table,array $where,integer $limit=NULL){
 
 		//Validation takes place in the object itself.
 		$query = new MySQLDeleteQuery($table,$where,$limit);
@@ -67,7 +68,7 @@ class MySQLDatabase extends Database{
 		
 	}
 
-	function drop(array $query=array()){
+	function drop(array $query){
 
 		//NOT YET IMPLEMENTED
 		

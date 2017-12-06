@@ -26,6 +26,10 @@ use SLDB\MySQL\MySQLDatabase;
 */
 class SLDB{
 
+	//---------------------------------------------------------------
+	// Private member variables.
+	//---------------------------------------------------------------
+
 	/**
 	* Whether SLDB has loaded a valid configuration array
 	*/
@@ -81,10 +85,12 @@ class SLDB{
 	/**
 	* Class Deconstructor
 	*/
-	function __destruct(){
+	function __destruct(){}
 
-	}
-
+	//---------------------------------------------------------------
+	// Private member functions.
+	//---------------------------------------------------------------
+	
 	/**
 	* Imports a configuration array to SLDB and verifies the accuracy of configuration keys
 	* as well as sets up required classes/variables within SLDS to match the supplied
@@ -154,6 +160,24 @@ class SLDB{
 			default:
 				throw new InvalidDatabaseTypeException();
 		}
+
+	}
+
+	//---------------------------------------------------------------
+	// Public member functions.
+	//---------------------------------------------------------------
+
+	/**
+	* Used for returning the database object to the user. This is
+	* required otherwise the user has no way of accessing the
+	* databases member query functions. 
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @return SLDB\Base\Database Object || NULL
+	*/
+	function getDatabase(){
+
+		return $this->_DATABASE;
 
 	}
 

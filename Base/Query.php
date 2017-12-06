@@ -8,6 +8,10 @@ namespace SLDB\Base;
 */
 class Query{
 
+	//---------------------------------------------------------------
+	// Protected member variables.
+	//---------------------------------------------------------------
+
 	/**
 	* Current stored query string
 	*/
@@ -43,9 +47,12 @@ class Query{
 	/**
 	* Class Constructor
 	*/
-	function __destruct(){
+	function __destruct(){}
 
-	}
+
+	//---------------------------------------------------------------
+	// Standard functions to be overidden per query child class.
+	//---------------------------------------------------------------
 
 	/**
 	* Validates the user provided query array to insure accuracy. Returns true if the provided
@@ -56,6 +63,18 @@ class Query{
 	* @return boolean
 	*/
 	protected function validateQuery(array $query){}
+
+	/**
+	* Runs the supplied query and returns true on success, false on failure.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @return boolean
+	*/
+	function commit(){}
+
+	//---------------------------------------------------------------
+	// Predefined functions used by query child classes.
+	//---------------------------------------------------------------	
 
 	/**
 	* Checks to see if an array has any empty values. This function can call itself if it finds
@@ -82,15 +101,6 @@ class Query{
 		return true;
 
 	}
-
-	/**
-	* Runs the supplied query and returns true on success, false on failure.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @return boolean
-	*/
-	function run(){}
-
 
 	/**
 	* Returns the previous database error.
