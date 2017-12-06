@@ -44,7 +44,7 @@ class Database{
 	function __destruct(){}
 
 	//---------------------------------------------------------------
-	// Standard functions to be overidden per query child class.
+	// Standard functions to be overidden per child class.
 	//---------------------------------------------------------------
 
 	function select(array $columns,string $table,array $where,integer $limit=NULL){}
@@ -59,7 +59,7 @@ class Database{
 
 
 	//---------------------------------------------------------------
-	// Predefined functions used by query child classes.
+	// Predefined functions used by child classes.
 	//---------------------------------------------------------------	
 
 	/**
