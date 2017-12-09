@@ -17,7 +17,8 @@ use SLDB\MySQL\MySQLDatabase;
 
 /**
 * SLDB Is a slim, lightweight database library for PHP. This main class works as a loader for the database as well
-* as initializing queries against any loaded database configuration. 
+* as initializing queries against any loaded database configuration. The class is mearly a means of abstraction for
+* all other database and query types, and routes requests accordignly based on the provided configuration.
 * @author Travis Truttschel
 * @version 1.0.0
 * @since 1.0.0

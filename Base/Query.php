@@ -18,45 +18,33 @@ class Query{
 	protected $_QUERY;
 
 	/**
-	* Last stored query error
+	* Current database type.
 	*/
-	protected $_ERROR;
+	protected $_DATABASE_TYPE;
 
 	/**
-	* Stored result rows
+	* Current Query Type.
 	*/
-	protected $_ROWS;
-
-	/**
-	* Total affected rows from last query
-	*/
-	protected $_ROWS_AFFECTED;
-
-	/**
-	* Result array to be returned.
-	*/
-	protected $_RESULT;
+	protected $_QUERY_TYPE;
 
 	/**
 	* Class Constructor
 	*/
 	function __construct(){
 
-		$this->$_ERROR          =  NULL;
-		$this->$_QUERY          =  NULL;
-		$this->$_ROWS           =  NULL;
-		$this->$_ROWS_AFFECTED  =  NULL;
+		$this->$_QUERY         = NULL;
+		$this->$_DATABASE_TYPE = NULL;
+		$this->$_QUERY_TYPE    = NULL;
 
 	}
 
 	/**
-	* Class Deconstructor
+	* Class Constructor
 	*/
 	function __destruct(){}
 
-
 	//---------------------------------------------------------------
-	// Standard functions to be overidden per query child class.
+	// Standard functions to be overidden per child class.
 	//---------------------------------------------------------------
 
 	/**
@@ -67,34 +55,58 @@ class Query{
 	* @param array
 	* @return boolean
 	*/
-	protected function validateQuery(array $query){}
+	protected function validateQueryArray(array $query){}
 
 	/**
-	* Generates the result array to be returned to the user. This function is overriden and called
-	* by specific query types to provide more dynamic result values depending on query type.
+	* Populates $this->_QUERY with proper syntax. Sets query type.
 	* @author Travis Truttschel
 	* @since 1.0.0
-	* @return array
+	* @param string (table), array (columns), array (where), integer (limit)
 	*/
-	protected function generateResultArray(){
-
-		$this->$_RESULT                     = array();
-		$this->$_RESULT['rows']             = $this->$_ROWS;
-		$this->$_RESULT['error']            = $this->$_ERROR;
-
-	}
+	function generateSelectQuery(string $table,array $columns,array $where,integer $limit=NULL){ $this->$_QUERY_TYPE='select'; }
 
 	/**
-	* Runs the supplied query and returns true on success, false on failure.
+	* Populates $this->_QUERY with proper syntax. Sets query type.
 	* @author Travis Truttschel
 	* @since 1.0.0
-	* @return boolean
+	* @param string (table), array (where), array (values), integer (limit)
 	*/
-	function commit(){}
+	function generateUpdateQuery(string $table,array $where,array $values,integer $limit=NULL){ $this->$_QUERY_TYPE='update'; }
 
+	/**
+	* Populates $this->_QUERY with proper syntax. Sets query type.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @param string (table), array (row)
+	*/
+	function generateInsertQuery(string $table,array $row){ $this->$_QUERY_TYPE='insert'; }
+
+	/**
+	* Populates $this->_QUERY with proper syntax. Sets query type.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @param string (table), array (fields)
+	*/
+	function generateCreateQuery(string $table,array $fields){ $this->$_QUERY_TYPE='create'; }
+
+	/**
+	* Populates $this->_QUERY with proper syntax. Sets query type.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @param string (table), array (where), integer (limit)
+	*/
+	function generateDeleteQuery(string $table,array $where,integer $limit=NULL){ $this->$_QUERY_TYPE='delete'; }
+
+	/**
+	* Populates $this->_QUERY with proper syntax. Sets query type.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @param string (table)
+	*/
+	function generateDropQuery(string $table){ $this->$_QUERY_TYPE='drop'; }
 
 	//---------------------------------------------------------------
-	// Predefined functions used by query child classes.
+	// Predefined functions used by child classes.
 	//---------------------------------------------------------------	
 
 	/**
@@ -106,7 +118,7 @@ class Query{
 	* @param array
 	* @return boolean
 	*/
-	private function noEmptyValues(array $array){
+	protected function noEmptyValues(array $array){
 
 		foreach( $array as $k =>$v ){
 			if(empty($v)){
@@ -123,35 +135,10 @@ class Query{
 
 	}
 
-	/**
-	* Returns the previous database error.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @return string || NULL
-	*/
-	function getError(){
-		return $this->_ERROR;
-	}
 
-	/**
-	* Returns the resulting rows from a select query.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @return array || NULL
-	*/
-	function getRows(){
-		return $this->_ROWS;
-	}
-
-	/**
-	* Returns total number of rows affected by the last query.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @return integer || NULL
-	*/
-	function getRowsAffected(){
-		return $this->_ROWS_AFFECTED;
-	}
+	//---------------------------------------------------------------
+	// Public functions
+	//---------------------------------------------------------------	
 
 	/**
 	* Returns the formatted raw query syntax for this query.
@@ -161,6 +148,26 @@ class Query{
 	*/
 	function getQuerySyntax(){
 		return $this->_QUERY;
+	}
+
+	/**
+	* Returns the type of query stored within this query.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @return string || NULL
+	*/
+	function getQueryType(){
+		return $this->_QUERY_TYPE;
+	}
+
+	/**
+	* Returns the database type this query is designed for.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @return string || NULL
+	*/
+	function getDatabaseType(){
+		return $this->_DATABASE_TYPE;
 	}
 
 }

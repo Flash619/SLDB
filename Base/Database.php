@@ -39,22 +39,23 @@ class Database{
 	function __destruct(){}
 
 	//---------------------------------------------------------------
-	// Standard functions to be overidden per child class.
+	// Public Functions to be overriden by child classes.
 	//---------------------------------------------------------------
 
 	function select(array $columns,string $table,array $where,integer $limit=NULL){}
+
+	function update(string $table,array $where,array $values,integer $limit=NULL){}
  
 	function insert(string $table,array $row){}
 
-	function create(){}
+	function create(string $table,array $fields){}
 
 	function delete(string $table,array $where,integer $limit=NULL){}
 
 	function drop(array $query){}
 
-
 	//---------------------------------------------------------------
-	// Predefined functions used by child classes.
+	// Public Functions
 	//---------------------------------------------------------------	
 
 	/**
@@ -74,8 +75,27 @@ class Database{
 	* @return string || NULL
 	*/
 	function getDatabaseType(){
-
 		return $this->$_DATABASE_TYPE;
+	}
+
+	//---------------------------------------------------------------
+	// Protected functions
+	//---------------------------------------------------------------	
+
+	//---------------------------------------------------------------
+	// Private functions
+	//---------------------------------------------------------------	
+
+	private function fatalQueryError($error){
+
+		$result                    = array();
+		$errors                    = array();
+		$errors[]                  = "Failed to generate query syntax."
+		$result['errors']          = $errors;
+		$result['rows']            = NULL;
+		$result['rows_affected']   = NULL;
+
+		return $result;
 
 	}
 

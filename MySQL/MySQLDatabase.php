@@ -3,12 +3,7 @@
 namespace SLDB\MySQL;
 
 use SLDB\Base\Database;
-use SLDB\MySQL\MySQLSelectQuery;
-use SLDB\MySQL\MySQLInsertQuery;
-use SLDB\MySQL\MySQLCreateQuery;
-use SLDB\MySQL\MySQLDeleteQuery;
-use SLDB\MySQL\MySQLDropQuery;
-
+use SLDB\MySQL\MySQLQuery;
 
 /**
 * This is the MySQLDatabase class used for all MySQL Database activities.
@@ -21,8 +16,12 @@ class MySQLDatabase extends Database{
 	* Class Constructor
 	*/
 	function __construct(){
+
+		Database::__construct();
+
 		$this->_CONFIGURED = false;
-		$this->_DATABASE_TYPE = 'MySQL';
+		$this->_DATABASE_TYPE = 'mysql';
+
 	}
 
 	/**
@@ -30,48 +29,112 @@ class MySQLDatabase extends Database{
 	*/
 	function __destruct(){}
 
-	function select(array $columns,string $table,array $where,integer $limit=NULL){
+	//---------------------------------------------------------------
+	// Public functions
+	//---------------------------------------------------------------	
 
-		//Validation takes place in the object itself.
-		$query = new MySQLSelectQuery($columns,$table,$where,$limit);
+	function select(string $table,array $columns,array $where,integer $limit=NULL){
 
-		if(!$query->commit()){
+		$query  = new MySQLQuery();
+		$errors = array();
+		$result = array();
 
+		// If query can generate syntax based on input continue, otherwise return errors.
+		if(! $query->generateSelectQuery($table,$columns,$where,$limit)){
+			return $this->fatalQueryError("Failed to generate query syntax.");
 		}
 
-		//TODO Running & Post Validation
+		//TODO PDO stuff.
 
+		return $result;
+	}
 
+	function update(string $table,array $where,array $values,integer $limit=NULL){
+
+		$query = new MySQLQuery();
+		$errors = array();
+		$result = array();
+
+		if(! $query->generateUpdateQuery($table,$where,$values,$limit)){
+			return $this->fatalQueryError("Failed to generate query syntax.");
+		}
+
+		//TODO PDO stuff.
+
+		return $result;
+		
 	}
 
 	function insert(string $table,array $row){
 
-		//Validation takes place in the object itself.
-		$query = new MySQLInsertQuery($table,$row);
-		
-		//TODO Running & Post Validation
+		$query = new MySQLQuery();
+		$errors = array();
+		$result = array();
+
+		if(! $query->generateInsertQuery($table,$row)){
+			return $this->fatalQueryError("Failed to generate query syntax.");
+		}
+
+		//TODO PDO stuff.
+
+		return $result;
 		
 	}
 
-	function create(){
+	function create(string $table,array $fields){
 
-		//NOT YET IMPLEMENTED
+		$query = new MySQLQuery();
+		$errors = array();
+		$result = array();
+
+		if(! $query->generateCreateQuery($table,$fields)){
+			return $this->fatalQueryError("Failed to generate query syntax.");
+		}
+
+		//TODO PDO stuff.
+
+		return $result;
 		
 	}
 
 	function delete(string $table,array $where,integer $limit=NULL){
 
-		//Validation takes place in the object itself.
-		$query = new MySQLDeleteQuery($table,$where,$limit);
-		
-		//TODO Running & Post Validation
+		$query = new MySQLQuery();
+		$errors = array();
+		$result = array();
+
+		if(! $query->generateDeleteQuery($table,$where,$limit)){
+			return $this->fatalQueryError("Failed to generate query syntax.");
+		}
+
+		//TODO PDO stuff.
+
+		return $result;
 		
 	}
 
-	function drop(array $query){
+	function drop(string $table){
 
-		//NOT YET IMPLEMENTED
+		$query = new MySQLQuery();
+		$errors = array();
+		$result = array();
+
+		if(! $query->generateDropQuery($table)){
+			return $this->fatalQueryError("Failed to generate query syntax.");
+		}
+
+		//TODO PDO stuff.
+
+		return $result;
 		
 	}
+
+	//---------------------------------------------------------------
+	// Protected functions
+	//---------------------------------------------------------------	
+
+	//---------------------------------------------------------------
+	// Private functions
+	//---------------------------------------------------------------		
 
 }
