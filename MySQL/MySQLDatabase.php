@@ -38,10 +38,10 @@ class MySQLDatabase extends Database{
 		$query  = new MySQLQuery();
 		$errors = array();
 		$result = array();
-
-		try{
+		
+		try {
 			$query->generateSelectQuery($table,$columns,$where,$limit);
-		}catch(Exception e){
+		} catch (Exception $e) {
 			return $this->fatalQueryError(e->getMessage());
 		}
 
@@ -58,7 +58,7 @@ class MySQLDatabase extends Database{
 
 		try{
 			$query->generateUpdateQuery($table,$where,$values,$limit);
-		}catch(Exception e){
+		}catch(Exception $e){
 			return $this->fatalQueryError($e->getMessage());
 		}
 
@@ -76,7 +76,7 @@ class MySQLDatabase extends Database{
 
 		try{
 			$query->generateInsertQuery($table,$row);
-		}catch(Exception e){
+		}catch(Exception $e){
 			return $this->fatalQueryError(e->getMessage());
 		}
 
@@ -94,7 +94,7 @@ class MySQLDatabase extends Database{
 
 		try{
 			$query->generateCreateQuery($table,$fields);
-		}catch(Exception e)
+		}catch(Exception $e)
 			return $this->fatalQueryError(e->getMessage());
 		}
 
@@ -112,7 +112,7 @@ class MySQLDatabase extends Database{
 
 		try{
 			$query->generateDeleteQuery($table,$where,$limit);
-		}catch(Exception e){
+		}catch(Exception $e){
 			return $this->fatalQueryError($e->getMessage());
 		}
 
@@ -130,7 +130,7 @@ class MySQLDatabase extends Database{
 
 		try{
 			$query->generateDropQuery($table);
-		}catch(Exception e)
+		}catch(Exception $e)
 			return $this->fatalQueryError($e->getMessage());
 		}
 
