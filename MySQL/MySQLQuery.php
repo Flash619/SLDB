@@ -36,14 +36,15 @@ class MySQLQuery extends Query{
 	* @author Travis Truttschel
 	* @since 1.0.0
 	* @param string (table), array (columns), array (where), integer (limit)
-	* @return boolean (true if creation of query syntax succeeded, otherwise false)
 	*/
 	function generateSelectQuery(string $table,array $columns,array $where,integer $limit=NULL){
 
 		// Call parent class function first for back end stuff.
 		Query::generateSelectQuery($table,$columns,$where,$limit);
 
-		return true;
+		if(empty($table) || empty($columns) || empty($where)){
+			throw new InvalidQueryValuesException("Required values not met.");
+		}
 
 	}
 
@@ -52,14 +53,15 @@ class MySQLQuery extends Query{
 	* @author Travis Truttschel
 	* @since 1.0.0
 	* @param string (table), array (where), array (values), integer (limit)
-	* @return boolean (true if creation of query syntax succeeded, otherwise false)
 	*/
 	function generateUpdateQuery(string $table,array $where,array $values,integer $limit=NULL){
 
 		// Call parent class function first for back end stuff.
 		Query::generateUpdateQuery($table,$where,$values,$limit);
 
-		return true;
+		if(empty($table) || empty($where) || empty($values)){
+			throw new InvalidQueryValuesException("Required values not met.");
+		}
 
 	}
 
@@ -68,14 +70,15 @@ class MySQLQuery extends Query{
 	* @author Travis Truttschel
 	* @since 1.0.0
 	* @param string (table), array (row)
-	* @return boolean (true if creation of query syntax succeeded, otherwise false)
 	*/
 	function generateInsertQuery(string $table,array $row){
 
 		// Call parent class function first for back end stuff.
 		Query::generateInsertQuery($table,$row);
 
-		return true;
+		if(empty($table) || empty($row)){
+			throw new InvalidQueryValuesException("Required values not met.");
+		}
 
 	}
 
@@ -84,14 +87,15 @@ class MySQLQuery extends Query{
 	* @author Travis Truttschel
 	* @since 1.0.0
 	* @param string (table), array (fields)
-	* @return boolean (true if creation of query syntax succeeded, otherwise false)
 	*/
 	function generateCreateQuery(string $table,array $fields){
 
 		// Call parent class function first for back end stuff.
 		Query::generateCreateQuery($table,$fields);
 
-		return true;
+		if(empty($table) || empty($fields)){
+			throw new InvalidQueryValuesException("Required values not met.");
+		}
 
 	}
 
@@ -100,14 +104,15 @@ class MySQLQuery extends Query{
 	* @author Travis Truttschel
 	* @since 1.0.0
 	* @param string (table)
-	* @return boolean (true if creation of query syntax succeeded, otherwise false)
 	*/
 	function generateDeleteQuery(string $table,array $where,integer $limit=NULL){
 
 		// Call parent class function first for back end stuff.
 		Query::generateDeleteQuery($table,$where,$limit);
 
-		return true;
+		if(empty($table) || empty($where)){
+			throw new InvalidQueryValuesException("Required values not met.");
+		}
 
 	}
 
@@ -116,14 +121,15 @@ class MySQLQuery extends Query{
 	* @author Travis Truttschel
 	* @since 1.0.0
 	* @param string (table), array (where), integer (limit)
-	* @return boolean (true if creation of query syntax succeeded, otherwise false)
 	*/
 	function generateDropQuery(string $table){
 
 		// Call parent class function first for back end stuff.
 		Query::generateDropQuery($table);
 
-		return true;
+		if(empty($table)){
+			throw new InvalidQueryValuesException("Required values not met.");
+		}
 
 	}
 

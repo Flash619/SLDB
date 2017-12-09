@@ -173,4 +173,4 @@ class Query{
 }
 
 class InvalidQueryTypeException extends Exception {}
-class InvalidQueryException extends Exception {}
+class InvalidQueryValuesException extends Exception {}

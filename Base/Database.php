@@ -86,11 +86,11 @@ class Database{
 	// Private functions
 	//---------------------------------------------------------------	
 
-	private function fatalQueryError($error){
+	private function fatalQueryError($error,$suberror = NULL){
 
 		$result                    = array();
 		$errors                    = array();
-		$errors[]                  = "Failed to generate query syntax."
+		$errors[]                  = "Failed to generate query syntax.";
 		$result['errors']          = $errors;
 		$result['rows']            = NULL;
 		$result['rows_affected']   = NULL;

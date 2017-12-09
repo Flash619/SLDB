@@ -39,9 +39,10 @@ class MySQLDatabase extends Database{
 		$errors = array();
 		$result = array();
 
-		// If query can generate syntax based on input continue, otherwise return errors.
-		if(! $query->generateSelectQuery($table,$columns,$where,$limit)){
-			return $this->fatalQueryError("Failed to generate query syntax.");
+		try{
+			$query->generateSelectQuery($table,$columns,$where,$limit);
+		}catch(Exception e){
+			return $this->fatalQueryError(e->getMessage());
 		}
 
 		//TODO PDO stuff.
@@ -55,8 +56,10 @@ class MySQLDatabase extends Database{
 		$errors = array();
 		$result = array();
 
-		if(! $query->generateUpdateQuery($table,$where,$values,$limit)){
-			return $this->fatalQueryError("Failed to generate query syntax.");
+		try{
+			$query->generateUpdateQuery($table,$where,$values,$limit);
+		}catch(Exception e){
+			return $this->fatalQueryError($e->getMessage());
 		}
 
 		//TODO PDO stuff.
@@ -71,8 +74,10 @@ class MySQLDatabase extends Database{
 		$errors = array();
 		$result = array();
 
-		if(! $query->generateInsertQuery($table,$row)){
-			return $this->fatalQueryError("Failed to generate query syntax.");
+		try{
+			$query->generateInsertQuery($table,$row);
+		}catch(Exception e){
+			return $this->fatalQueryError(e->getMessage());
 		}
 
 		//TODO PDO stuff.
@@ -87,8 +92,10 @@ class MySQLDatabase extends Database{
 		$errors = array();
 		$result = array();
 
-		if(! $query->generateCreateQuery($table,$fields)){
-			return $this->fatalQueryError("Failed to generate query syntax.");
+		try{
+			$query->generateCreateQuery($table,$fields);
+		}catch(Exception e)
+			return $this->fatalQueryError(e->getMessage());
 		}
 
 		//TODO PDO stuff.
@@ -103,8 +110,10 @@ class MySQLDatabase extends Database{
 		$errors = array();
 		$result = array();
 
-		if(! $query->generateDeleteQuery($table,$where,$limit)){
-			return $this->fatalQueryError("Failed to generate query syntax.");
+		try{
+			$query->generateDeleteQuery($table,$where,$limit);
+		}catch(Exception e){
+			return $this->fatalQueryError($e->getMessage());
 		}
 
 		//TODO PDO stuff.
@@ -119,8 +128,10 @@ class MySQLDatabase extends Database{
 		$errors = array();
 		$result = array();
 
-		if(! $query->generateDropQuery($table)){
-			return $this->fatalQueryError("Failed to generate query syntax.");
+		try{
+			$query->generateDropQuery($table);
+		}catch(Exception e)
+			return $this->fatalQueryError($e->getMessage());
 		}
 
 		//TODO PDO stuff.
