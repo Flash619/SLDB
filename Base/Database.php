@@ -86,7 +86,7 @@ class Database{
 	// Private functions
 	//---------------------------------------------------------------	
 
-	private function fatalQueryError($error,$suberror = NULL){
+	private function fatalQueryError($error){
 
 		$result                    = array();
 		$errors                    = array();
