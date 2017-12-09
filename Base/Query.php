@@ -33,6 +33,11 @@ class Query{
 	protected $_ROWS_AFFECTED;
 
 	/**
+	* Result array to be returned.
+	*/
+	protected $_RESULT;
+
+	/**
 	* Class Constructor
 	*/
 	function __construct(){
@@ -45,7 +50,7 @@ class Query{
 	}
 
 	/**
-	* Class Constructor
+	* Class Deconstructor
 	*/
 	function __destruct(){}
 
@@ -65,12 +70,28 @@ class Query{
 	protected function validateQuery(array $query){}
 
 	/**
+	* Generates the result array to be returned to the user. This function is overriden and called
+	* by specific query types to provide more dynamic result values depending on query type.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @return array
+	*/
+	protected function generateResultArray(){
+
+		$this->$_RESULT                     = array();
+		$this->$_RESULT['rows']             = $this->$_ROWS;
+		$this->$_RESULT['error']            = $this->$_ERROR;
+
+	}
+
+	/**
 	* Runs the supplied query and returns true on success, false on failure.
 	* @author Travis Truttschel
 	* @since 1.0.0
 	* @return boolean
 	*/
 	function commit(){}
+
 
 	//---------------------------------------------------------------
 	// Predefined functions used by query child classes.

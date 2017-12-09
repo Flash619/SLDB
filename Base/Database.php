@@ -25,11 +25,6 @@ class Database{
 	protected $_DATABASE_TYPE;
 
 	/**
-	* The last known error recieved from the database engine in PHP
-	*/
-	protected $_LAST_ERROR;
-
-	/**
 	* Class Constructor
 	*/
 	function __construct(){
@@ -39,7 +34,7 @@ class Database{
 	}
 
 	/**
-	* Class Destructor
+	* Class Deconstructor
 	*/
 	function __destruct(){}
 

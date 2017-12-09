@@ -26,7 +26,7 @@ class MySQLDatabase extends Database{
 	}
 
 	/**
-	* Class Destructor
+	* Class Deconstructor
 	*/
 	function __destruct(){}
 

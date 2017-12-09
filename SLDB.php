@@ -31,11 +31,6 @@ class SLDB{
 	//---------------------------------------------------------------
 
 	/**
-	* Whether SLDB has loaded a valid configuration array
-	*/
-	private $_CONFIGURED;
-
-	/**
 	* The configuration array for SLDB
 	*/
 	private $_CONFIG;
@@ -61,7 +56,6 @@ class SLDB{
 	function __construct(array $config=array()){
 
 		//Define member variables
-		$this->_CONFIGURED   =   NULL;
 		$this->_CONFIG       =   array();
 		$params = array(
 			'database_type',
@@ -168,17 +162,101 @@ class SLDB{
 	//---------------------------------------------------------------
 
 	/**
-	* Used for returning the database object to the user. This is
-	* required otherwise the user has no way of accessing the
-	* databases member query functions. 
+	* Used for returning the database object to the user directly.
 	* @author Travis Truttschel
 	* @since 1.0.0
-	* @return SLDB\Base\Database Object || NULL
+	* @return SLDB\Base\Database || NULL
 	*/
 	function getDatabase(){
 
 		return $this->_DATABASE;
 
+	}
+
+	/**
+	* Accesses the select function of the current database.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @param string (table), array (columns), array (where), integer (limit)
+	* @return array (results) || NULL
+	*/
+	function select(string $table,array $columns,array $where,integer $limit=NULL){
+
+		if( $this->$_DATABASE instanceof Database ){
+			return $this->$_DATABASE->select($columns,$table,$where,$limit);
+		}
+
+		return NULL;
+
+
+	}
+
+	/**
+	* Accesses the insert function of the current database.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @param string (table), array (row)
+	* @return array (results) || NULL
+	*/
+	function insert(string $table,array $row){
+
+		if( $this->$_DATABASE instanceof Database ){
+			return $this->$_DATABASE->insert($table,$where,$limit);
+		}
+
+		return NULL;
+		
+	}
+
+	/**
+	* Accesses the create function of the current database.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @param string (table), array (fields)
+	* @return array (results) || NULL
+	*/
+	function create(string $table,array $fields){
+
+		if( $this->$_DATABASE instanceof Database ){
+			return $this->$_DATABASE->create($table,$fields);
+		}
+
+		return NULL;
+		
+	}
+
+	/**
+	* Accesses the delete function of the current database.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @param string (table), array (where), integer (limit)
+	* @return array (results) || NULL
+	*/
+	function delete(string $table,array $where,integer $limit=NULL){
+
+		if( $this->$_DATABASE instanceof Database ){
+			return $this->$_DATABASE->delete($table,$where,$limit);
+		}
+
+		return NULL;
+		
+	}
+
+	/**
+	* Accesses the drop function of the current database.
+	* @author Travis Truttschel
+	* @since 1.0.0
+	* @param string (table)
+	* @return array (results) || NULL
+	*/
+	function drop(string $table){
+
+		if( $this->$_DATABASE instanceof Database ){
+			return $this->$_DATABASE->drop($table);
+		}
+
+		return NULL;
+		
 	}
 
 }
