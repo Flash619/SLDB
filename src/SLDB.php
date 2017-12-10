@@ -62,8 +62,8 @@ class SLDB{
 			'database_type',
 			'database_name',
 			'database_host',
-			'database_username',
-			'database_password');
+			'database_user',
+			'database_pass');
 		$this->_VALID_CONFIG_PARAMS = $params;
 		$this->_REQUIRED_CONFIG_PARAMS = $params;
 		$this->_DATABASE     =   NULL;
