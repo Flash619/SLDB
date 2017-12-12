@@ -1,10 +1,7 @@
-SLDB Basics
-===========
-
 SLDB Base Class
 ---------------
 
-Here is an outline of the core functions within the *SLDB* main class. Every interaction with the database will be handled by the *SLDB* main class/object. Take note of the type hints for each argument as well as optional arguments as we outline each function.
+Here is an outline of the core functions within the *SLDB* main class. Every interaction with the database will be handled by the *SLDB* main class/object.
 
 .. class:: SLDB
 
@@ -20,11 +17,6 @@ Here is an outline of the core functions within the *SLDB* main class. Every int
 
 	.. method:: delete(string $table, array $where)
 				delete(string $table, array $where, integer $limit)
-
-
-The constructor for SLDB takes a configuration array. This array tells SLDB how to connect with your database. If no array is provided, SLDB will throw a *InvalidConfigurationException()* and fail to initialize. 
-
-The order of arguments for *query functions* closely matches traditional MySQL query structure. This is entirely intentional to help prevent users from having to re-learn query language. Certain array arguments do not require specific key-value pairs. For instance, a list of affected fields could simply be an array of field names, wheras an array for defining when a query should take affect, will include field names as well as required values to match.
 
 
 Query Concepts

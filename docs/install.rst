@@ -42,3 +42,5 @@ Once installed, SLDB can be used as seen below.
     print_r($results);
 
 The above example will create a SLDB object, connect SLDB to a database, and run a *select* query returning the fields *order_id*, *first_name*, and *date_pickup* from the *orders* table where the *date_ordered* field is equal to *1027-11-15* with a *limit* of 15 rows returned.
+
+For more details and examples, it is recommended that you first read Query Basics before writing any projects.

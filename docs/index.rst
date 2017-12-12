@@ -1,9 +1,12 @@
 SLDB - Simple Lightweight Database Controller
 =============================================
 
-**This documentation is currently under construction and accuracy is not guaranteed.**
+.. ATTENTION::
+	**This documentation is currently under construction and accuracy is not guaranteed.**
 
 SLDB is a simple lightweight database controller that provides a way to write complicated queries fast and efficiently for multiple database types in PHP. The primary goal of SLDB is to simplify database query writing as well as provide abstraction for various database types without the user having to do any heavy lifting.
+
+SLDB completely automates protection from things like SQL injection and provides data sanitation for all values submitted. 
 
 Supported Databases
 -------------------
@@ -15,7 +18,8 @@ User Documentation
    :maxdepth: 2
 
    ./install
-   ./the-basics
+   ./query-syntax
+   ./query-examples
 
 Contributing
 ------------
