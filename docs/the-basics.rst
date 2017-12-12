@@ -1,0 +1,35 @@
+SLDB Basics
+===========
+
+SLDB Base Class
+---------------
+
+Here is an outline of the core functions within the *SLDB* main class. Every interaction with the database will be handled by the *SLDB* main class/object. Take note of the type hints for each argument as well as optional arguments as we outline each function.
+
+.. class:: SLDB
+
+	.. method:: __construct(array $config=array())
+
+	.. method:: select(string $table, array $fields, array $where)
+				select(string $table, array $fields, array $where, integer $limit)
+
+	.. method:: insert(string $table, array $row)
+
+	.. method:: update(string $table, array $where, array $values)
+				update(string $table, array $where, array $values, integer $limit)
+
+	.. method:: delete(string $table, array $where)
+				delete(string $table, array $where, integer $limit)
+
+
+The constructor for SLDB takes a configuration array. This array tells SLDB how to connect with your database. If no array is provided, SLDB will throw a *InvalidConfigurationException()* and fail to initialize. 
+
+The order of arguments for *query functions* closely matches traditional MySQL query structure. This is entirely intentional to help prevent users from having to re-learn query language. Certain array arguments do not require specific key-value pairs. For instance, a list of affected fields could simply be an array of field names, wheras an array for defining when a query should take affect, will include field names as well as required values to match.
+
+
+Query Concepts
+--------------
+
+When deciding how to structure queries, SLDB tries to make it as natural feeling as possible. This being said, typically the order of arguments passed to a *query function* is *table*, *fields*, *where*, and *limit*. Aditional arguments may be used or required depending on the target result. For this article, we are going to go over basic query structure as well as a few aditional arguments you may use. This article does not cover *join* or *union* as these are on the advanced queryes page.
+
+Queries are initialized by a call to a *query function* within the *SLDB Object*. Most basic queries will use *query functions* that are named after the queries primary operator or command. Basic queries such as select, insert, delete, and update can be called by their corresponding *query functions*. Basic *query functions* are outlined below.
