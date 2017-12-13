@@ -63,7 +63,7 @@ class Query{
 	* @since 1.0.0
 	* @param string (table), array (columns), array (where), integer (limit)
 	*/
-	function generateSelectQuery(string $table,array $columns,array $where,integer $limit=NULL){ $this->$_QUERY_TYPE='select'; }
+	function generateSelectQuery(string $table,array $columns,array $where,integer $limit=NULL,$offset=NULL){ $this->$_QUERY_TYPE='select'; }
 
 	/**
 	* Populates $this->_QUERY with proper syntax. Sets query type.

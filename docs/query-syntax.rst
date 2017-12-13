@@ -18,10 +18,13 @@ Select
 
 	.. method:: SLDB::select($table, $fields, $where)
 				SLDB::select($table, $fields, $where, $limit)
+				SLDB::select($table, $fields, $where, $limit, $offset)
 
 				:param string $table: Table to query.
 				:param array $fields: Field names to return.
 				:param array $where: Field name/value pairs required to select.
+				:param integer $limit: Limit the number of rows returned to this value.
+				:param integer $offset: Offset the returned rows by this value.
 				:returns: SLDB result array, or NULL if there is an internal error.
 
 Insert
@@ -45,6 +48,7 @@ Update
 				:param string $table: Table to query.
 				:param array $where: Field name/value pairs to query against.
 				:param array $values: Field name/value pairs to set.
+				:param integer $limit: Limit the number of rows affected to this value.
 				:returns: SLDB result array, or NULL if there is an internal error.
 
 Delete
@@ -57,4 +61,5 @@ Delete
 
 				:param string $table: Table to query.
 				:param array $where: Field name/value pairs required to delete.
+				:param integer $limit: Limit the number of rows affected to this value.
 				:returns: SLDB result array, or NULL if there is an internal error.
