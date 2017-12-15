@@ -89,12 +89,9 @@ class MySQLQuery extends Query{
 			//Add the syntax without a value
 			$s = $s.$k.$o."?";
 
-			//If this is not the last key in the array, add AND or OR
-			if(array_search($k, array_keys($values)) < count($values)){
-				$s = $s." AND ";
-			}
-
 		}
+
+		$s = rtrim($s,' AND ');
 
 	}
 
@@ -210,7 +207,7 @@ class MySQLQuery extends Query{
 	* @since 1.0.0
 	* @param string (table), array (row)
 	*/
-	function generateInsertQuery(string $table,array $row){
+	function generateInsertQuery(string $table,array $values){
 
 		// Call parent class function first for back end stuff.
 		Query::generateInsertQuery($table,$row);
@@ -219,9 +216,45 @@ class MySQLQuery extends Query{
 		$result['params'] = array();
 		$result['query'] = "";
 
+		//-----------------------------
+		// Query Validation
+		//-----------------------------
+
+
 		if(empty($table) || empty($row)){
 			throw new InvalidQueryValuesException("Required values not met.");
 		}
+		
+                //-----------------------------
+		// Base Syntax Generation
+		//-----------------------------
+
+		$q = "INSERT INTO ".$table."(";
+
+		foreach($values as $k => $v){
+
+			$q = $q.$k.",";
+
+		}
+
+		$q = rtrim($q,',');
+
+		$q = $q.") VALUES (";
+
+		foreach($values as $k => $v){
+
+			$q = $q."?".",";
+			$result['params'][] = $v;
+
+		}
+
+		$q = rtrim($q,',');
+
+		$q = $q.")";
+
+		$result['query'] = $q;
+
+		return $result;
 
 	}
 
@@ -260,10 +293,35 @@ class MySQLQuery extends Query{
 
 		// Call parent class function first for back end stuff.
 		Query::generateDeleteQuery($table,$where,$limit);
+         
+  		//-----------------------------
+		// Query Validation
+		//-----------------------------
 
 		if(empty($table) || empty($where)){
 			throw new InvalidQueryValuesException("Required values not met.");
 		}
+
+        	 //-----------------------------
+		// Base Syntax Generation
+		//-----------------------------
+
+		$q = "DELETE FROM ".$table." WHERE ".$this->keyValuesToSyntax($where);
+	
+		foreach($where $k => $v){
+
+			$result['params'][] = $v;
+
+    		}
+
+		// Add limit and/or offset if requested
+		if($limit !== NULL){
+			$q = $q." LIMIT ".$limit;
+		}
+
+		$result['query'] = $q;
+		
+		return $result;
 
 	}
 

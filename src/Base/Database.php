@@ -42,11 +42,11 @@ class Database{
 	// Public Functions to be overriden by child classes.
 	//---------------------------------------------------------------
 
-	function select(array $columns,string $table,array $where,integer $limit=NULL){}
+	function select(array $columns,string $table,array $where,integer $limit=NULL,integer $offset=NULL){}
 
 	function update(string $table,array $where,array $values,integer $limit=NULL){}
  
-	function insert(string $table,array $row){}
+	function insert(string $table,array $values){}
 
 	function create(string $table,array $fields){}
 

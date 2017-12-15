@@ -181,10 +181,10 @@ class SLDB{
 	* @param string (table), array (columns), array (where), integer (limit)
 	* @return array (results) || NULL
 	*/
-	function select(string $table,array $columns,array $where,integer $limit=NULL){
+	function select(string $table,array $columns,array $where,integer $limit=NULL,integer $offset=NULL){
 
 		if( $this->$_DATABASE instanceof Database ){
-			return $this->$_DATABASE->select($columns,$table,$where,$limit);
+			return $this->$_DATABASE->select($columns,$table,$where,$limit,$offset);
 		}
 
 		return NULL;
@@ -199,10 +199,10 @@ class SLDB{
 	* @param string (table), array (row)
 	* @return array (results) || NULL
 	*/
-	function insert(string $table,array $row){
+	function insert(string $table,array $values){
 
 		if( $this->$_DATABASE instanceof Database ){
-			return $this->$_DATABASE->insert($table,$where,$limit);
+			return $this->$_DATABASE->insert($table,$values);
 		}
 
 		return NULL;
@@ -216,15 +216,7 @@ class SLDB{
 	* @param string (table), array (fields)
 	* @return array (results) || NULL
 	*/
-	function create(string $table,array $fields){
-
-		if( $this->$_DATABASE instanceof Database ){
-			return $this->$_DATABASE->create($table,$fields);
-		}
-
-		return NULL;
-		
-	}
+	function create(string $table,array $fields){ throw new NotYetImplementedException(); }
 
 	/**
 	* Accesses the delete function of the current database.
@@ -250,15 +242,7 @@ class SLDB{
 	* @param string (table)
 	* @return array (results) || NULL
 	*/
-	function drop(string $table){
-
-		if( $this->$_DATABASE instanceof Database ){
-			return $this->$_DATABASE->drop($table);
-		}
-
-		return NULL;
-		
-	}
+	function drop(string $table){ throw new NotYetImplementedException(); }
 
 }
 
@@ -266,3 +250,4 @@ class InvalidConfigurationValueException extends Exception{}
 class InvalidConfigurationOptionException extends Exception{}
 class InvalidConfigurationException extends Exception{}
 class InvalidDatabaseTypeException extends Exception{}
+class NotYetImplementedException extends Exception{}

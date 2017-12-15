@@ -33,14 +33,14 @@ class MySQLDatabase extends Database{
 	// Public functions
 	//---------------------------------------------------------------	
 
-	function select(string $table,array $columns,array $where,integer $limit=NULL){
+	function select(string $table,array $columns,array $where,integer $limit=NULL,integer $offset=NULL){
 
 		$query  = new MySQLQuery();
 		$errors = array();
 		$result = array();
 		
 		try {
-			$query->generateSelectQuery($table,$columns,$where,$limit);
+			$query->generateSelectQuery($table,$columns,$where,$limit,$offset);
 		} catch (Exception $e) {
 			return $this->fatalQueryError(e->getMessage());
 		}
@@ -68,14 +68,14 @@ class MySQLDatabase extends Database{
 		
 	}
 
-	function insert(string $table,array $row){
+	function insert(string $table,array $values){
 
 		$query = new MySQLQuery();
 		$errors = array();
 		$result = array();
 
 		try{
-			$query->generateInsertQuery($table,$row);
+			$query->generateInsertQuery($table,$values);
 		}catch(Exception $e){
 			return $this->fatalQueryError(e->getMessage());
 		}
