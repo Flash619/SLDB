@@ -36,11 +36,12 @@ class MySQLDatabase extends Database{
 	function select(string $table,array $columns,array $where,integer $limit=NULL,integer $offset=NULL){
 
 		$query  = new MySQLQuery();
+		$syntax = '';
 		$errors = array();
 		$result = array();
 		
 		try {
-			$query->generateSelectQuery($table,$columns,$where,$limit,$offset);
+			$syntax = $query->generateSelectQuery($table,$columns,$where,$limit,$offset);
 		} catch (Exception $e) {
 			return $this->fatalQueryError(e->getMessage());
 		}
@@ -53,11 +54,12 @@ class MySQLDatabase extends Database{
 	function update(string $table,array $where,array $values,integer $limit=NULL){
 
 		$query = new MySQLQuery();
+		$syntax = '';
 		$errors = array();
 		$result = array();
 
 		try{
-			$query->generateUpdateQuery($table,$where,$values,$limit);
+			$syntax = $query->generateUpdateQuery($table,$where,$values,$limit);
 		}catch(Exception $e){
 			return $this->fatalQueryError($e->getMessage());
 		}
@@ -71,11 +73,12 @@ class MySQLDatabase extends Database{
 	function insert(string $table,array $values){
 
 		$query = new MySQLQuery();
+		$syntax = '';
 		$errors = array();
 		$result = array();
 
 		try{
-			$query->generateInsertQuery($table,$values);
+			$syntax = $query->generateInsertQuery($table,$values);
 		}catch(Exception $e){
 			return $this->fatalQueryError(e->getMessage());
 		}
@@ -89,11 +92,12 @@ class MySQLDatabase extends Database{
 	function create(string $table,array $fields){
 
 		$query = new MySQLQuery();
+		$syntax = '';
 		$errors = array();
 		$result = array();
 
 		try{
-			$query->generateCreateQuery($table,$fields);
+			$syntax = $query->generateCreateQuery($table,$fields);
 		}catch(Exception $e)
 			return $this->fatalQueryError(e->getMessage());
 		}
@@ -107,11 +111,12 @@ class MySQLDatabase extends Database{
 	function delete(string $table,array $where,integer $limit=NULL){
 
 		$query = new MySQLQuery();
+		$syntax = '';
 		$errors = array();
 		$result = array();
 
 		try{
-			$query->generateDeleteQuery($table,$where,$limit);
+			$syntax = $query->generateDeleteQuery($table,$where,$limit);
 		}catch(Exception $e){
 			return $this->fatalQueryError($e->getMessage());
 		}
@@ -125,11 +130,12 @@ class MySQLDatabase extends Database{
 	function drop(string $table){
 
 		$query = new MySQLQuery();
+		$syntax = '';
 		$errors = array();
 		$result = array();
 
 		try{
-			$query->generateDropQuery($table);
+			$syntax = $query->generateDropQuery($table);
 		}catch(Exception $e)
 			return $this->fatalQueryError($e->getMessage());
 		}

@@ -129,26 +129,9 @@ class SLDB{
 		if($matchedParams != $this->_REQUIRED_CONFIG_PARAMS){
 			throw new InvalidConfigurationException();
 		}
-
-		// --------------------------------------------------
-		// Setup Required Member Objects & Save Configuration
-		// --------------------------------------------------
-
-		$this-$_CONFIG = $config;
-		$this->initializeConfig();
-
-	}
-
-	/**
-	* Sets up all member objects based on the configuration stored within SLDB.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @throws InvalidConfigurationException InvalidDatabaseTypeException
-	*/
-	private function initializeConfig(){
-
+		
 		//Initialize based on database type
-		switch(strtolower($this->_CONFIG['database_type'])){
+		switch(strtolower($config['database_type'])){
 			case 'mysql':
 				$this->_DATABASE = new MySQLDatabase();
 				break;
@@ -156,7 +139,11 @@ class SLDB{
 				throw new InvalidDatabaseTypeException();
 		}
 
+		//Save config for future reference
+		$this-$_CONFIG = $config;
+
 	}
+
 
 	//---------------------------------------------------------------
 	// Public member functions.

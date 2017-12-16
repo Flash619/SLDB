@@ -16,8 +16,8 @@ Select
 
 .. class:: SLDB
 
-	.. method:: SLDB::select($table, $fields, $where) \
-				SLDB::select(table, $fields, $where, $limit) \
+	.. method:: SLDB::select($table, $fields, $where)
+				SLDB::select(table, $fields, $where, $limit)
 				SLDB::select($table, $fields, $where, $limit, $offset)
 
 				:param string $table: Table to query.
@@ -42,7 +42,7 @@ Update
 
 .. class:: SLDB
 
-	.. method:: SLDB::update($table, $where, $values) \
+	.. method:: SLDB::update($table, $where, $values)
 				SLDB::update($table, $where, $values, $limit)
 
 				:param string $table: Table to query.
@@ -56,7 +56,7 @@ Delete
 
 .. class:: SLDB
 
-	.. method:: SLDB::delete($table, $where) \
+	.. method:: SLDB::delete($table, $where)
 				SLDB::delete($table, $where, $limit)
 
 				:param string $table: Table to query.
