@@ -93,6 +93,8 @@ class MySQLQuery extends Query{
 
 		$s = rtrim($s,' AND ');
 
+		return $s;
+
 	}
 
 	//---------------------------------------------------------------
