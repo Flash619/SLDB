@@ -18,7 +18,7 @@ class MySQLQuery extends Query{
 
 		Query::__construct();
 
-		$this->$_DATABASE_TYPE = 'mysql';
+		$this->_DATABASE_TYPE = 'mysql';
 
 	}
 
@@ -38,7 +38,7 @@ class MySQLQuery extends Query{
 	* @param string (operator shortcode)
 	*/
 	private function operatorToSyntax(string $operator){
-		switch strtolower($shortcode) {
+		switch (strtolower($shortcode)) {
 			case 'l':
 			case '%':
 				return " LIKE ";
@@ -77,13 +77,13 @@ class MySQLQuery extends Query{
 		foreach($values as $k => $v){
 
 			//Grab a shortcode from a value
-			pregg_match('/^\[([A-z]+)\]/',$v,$matches);
+			preg_match('/^\[([A-z]+)\]/',$v,$matches);
 
 			//Generate the operator
 			if(!empty($matches[1])){
 				$o = $this->operatorToSyntax($matches[1]);
 			}else{
-				$o = " = "
+				$o = " = ";
 			}
 
 			//Add the syntax without a value
@@ -107,11 +107,11 @@ class MySQLQuery extends Query{
 	* @since 1.0.0
 	* @param string (table), array (columns), array (where), integer (limit)
 	*/
-	function generateSelectQuery(string $table,array $columns,array $where,integer $limit=NULL,integer $offset=NULL){
+	function generateSelectQuery(string $table,array $columns,array $where,int $limit=NULL,int $offset=NULL){
 
 		$result = array();
 		$result['params'] = array();
-		$result['query'] = "";
+		$result['syntax'] = "";
 
 		//-----------------------------
 		// Query Validation
@@ -139,14 +139,16 @@ class MySQLQuery extends Query{
 
 		// Add limit and/or offset if requested
 		if($limit !== NULL){
-			$q = $q." LIMIT ".$limit;
+			$q = $q." LIMIT ?";
+			$result['params'][] = $limit;
 		}
 
 		if($offset !== NULL){
-			$q = $q." OFFSET ".$offset;
+			$q = $q." OFFSET ?";
+			$result['params'][] = $offset;
 		}
 
-		$result['query'] = $q;
+		$result['syntax'] = $q;
 
 		return $result;
 
@@ -158,14 +160,14 @@ class MySQLQuery extends Query{
 	* @since 1.0.0
 	* @param string (table), array (where), array (values), integer (limit)
 	*/
-	function generateUpdateQuery(string $table,array $where,array $values,integer $limit=NULL){
+	function generateUpdateQuery(string $table,array $where,array $values,int $limit=NULL){
 
 		// Call parent class function first for back end stuff.
 		Query::generateUpdateQuery($table,$where,$values,$limit);
 
 		$result = array();
 		$result['params'] = array();
-		$result['query'] = "";
+		$result['syntax'] = "";
 
 		//-----------------------------
 		// Query Validation
@@ -192,10 +194,11 @@ class MySQLQuery extends Query{
 
 		// Add limit and/or offset if requested
 		if($limit !== NULL){
-			$q = $q." LIMIT ".$limit;
+			$q = $q." LIMIT ?";
+			$result['params'][] = $limit;
 		}
 
-		$results['query'] = $q;
+		$results['syntax'] = $q;
 
 		return $result;
 
@@ -210,26 +213,26 @@ class MySQLQuery extends Query{
 	function generateInsertQuery(string $table,array $values){
 
 		// Call parent class function first for back end stuff.
-		Query::generateInsertQuery($table,$row);
+		Query::generateInsertQuery($table,$values);
 
 		$result = array();
 		$result['params'] = array();
-		$result['query'] = "";
+		$result['syntax'] = "";
 
 		//-----------------------------
 		// Query Validation
 		//-----------------------------
 
 
-		if(empty($table) || empty($row)){
+		if(empty($table) || empty($values)){
 			throw new InvalidQueryValuesException("Required values not met.");
 		}
 		
-                //-----------------------------
+        //-----------------------------
 		// Base Syntax Generation
 		//-----------------------------
 
-		$q = "INSERT INTO ".$table."(";
+		$q = "INSERT INTO ".$table." (";
 
 		foreach($values as $k => $v){
 
@@ -252,7 +255,7 @@ class MySQLQuery extends Query{
 
 		$q = $q.")";
 
-		$result['query'] = $q;
+		$result['syntax'] = $q;
 
 		return $result;
 
@@ -271,7 +274,7 @@ class MySQLQuery extends Query{
 
 		$result = array();
 		$result['params'] = array();
-		$result['query'] = "";
+		$result['syntax'] = "";
 
 		if(empty($table) || empty($fields)){
 			throw new InvalidQueryValuesException("Required values not met.");
@@ -285,11 +288,11 @@ class MySQLQuery extends Query{
 	* @since 1.0.0
 	* @param string (table)
 	*/
-	function generateDeleteQuery(string $table,array $where,integer $limit=NULL){
+	function generateDeleteQuery(string $table,array $where,int $limit=NULL){
 
 		$result = array();
 		$result['params'] = array();
-		$result['query'] = "";
+		$result['syntax'] = "";
 
 		// Call parent class function first for back end stuff.
 		Query::generateDeleteQuery($table,$where,$limit);
@@ -303,12 +306,12 @@ class MySQLQuery extends Query{
 		}
 
         	 //-----------------------------
-		// Base Syntax Generation
+		// Base Syntax GenerationW
 		//-----------------------------
 
 		$q = "DELETE FROM ".$table." WHERE ".$this->keyValuesToSyntax($where);
 	
-		foreach($where $k => $v){
+		foreach($where as $k => $v){
 
 			$result['params'][] = $v;
 
@@ -316,10 +319,11 @@ class MySQLQuery extends Query{
 
 		// Add limit and/or offset if requested
 		if($limit !== NULL){
-			$q = $q." LIMIT ".$limit;
+			$q = $q." LIMIT ?";
+			$result['params'][] = $limit;
 		}
 
-		$result['query'] = $q;
+		$result['syntax'] = $q;
 		
 		return $result;
 
@@ -335,7 +339,7 @@ class MySQLQuery extends Query{
 
 		$result = array();
 		$result['params'] = array();
-		$result['query'] = "";
+		$result['syntax'] = "";
 
 		// Call parent class function first for back end stuff.
 		Query::generateDropQuery($table);

@@ -13,28 +13,16 @@ class Query{
 	//---------------------------------------------------------------
 
 	/**
-	* Current stored query string
-	*/
-	protected $_QUERY;
-
-	/**
 	* Current database type.
 	*/
 	protected $_DATABASE_TYPE;
-
-	/**
-	* Current Query Type.
-	*/
-	protected $_QUERY_TYPE;
 
 	/**
 	* Class Constructor
 	*/
 	function __construct(){
 
-		$this->$_QUERY         = NULL;
-		$this->$_DATABASE_TYPE = NULL;
-		$this->$_QUERY_TYPE    = NULL;
+		$this->_DATABASE_TYPE = NULL;
 
 	}
 
@@ -63,7 +51,7 @@ class Query{
 	* @since 1.0.0
 	* @param string (table), array (columns), array (where), integer (limit)
 	*/
-	function generateSelectQuery(string $table,array $columns,array $where,integer $limit=NULL,$offset=NULL){ $this->$_QUERY_TYPE='select'; }
+	function generateSelectQuery(string $table,array $columns,array $where,int $limit=NULL,int $offset=NULL){}
 
 	/**
 	* Populates $this->_QUERY with proper syntax. Sets query type.
@@ -71,7 +59,7 @@ class Query{
 	* @since 1.0.0
 	* @param string (table), array (where), array (values), integer (limit)
 	*/
-	function generateUpdateQuery(string $table,array $where,array $values,integer $limit=NULL){ $this->$_QUERY_TYPE='update'; }
+	function generateUpdateQuery(string $table,array $where,array $values,int $limit=NULL){}
 
 	/**
 	* Populates $this->_QUERY with proper syntax. Sets query type.
@@ -79,7 +67,7 @@ class Query{
 	* @since 1.0.0
 	* @param string (table), array (row)
 	*/
-	function generateInsertQuery(string $table,array $row){ $this->$_QUERY_TYPE='insert'; }
+	function generateInsertQuery(string $table,array $row){}
 
 	/**
 	* Populates $this->_QUERY with proper syntax. Sets query type.
@@ -87,7 +75,7 @@ class Query{
 	* @since 1.0.0
 	* @param string (table), array (fields)
 	*/
-	function generateCreateQuery(string $table,array $fields){ $this->$_QUERY_TYPE='create'; }
+	function generateCreateQuery(string $table,array $fields){}
 
 	/**
 	* Populates $this->_QUERY with proper syntax. Sets query type.
@@ -95,7 +83,7 @@ class Query{
 	* @since 1.0.0
 	* @param string (table), array (where), integer (limit)
 	*/
-	function generateDeleteQuery(string $table,array $where,integer $limit=NULL){ $this->$_QUERY_TYPE='delete'; }
+	function generateDeleteQuery(string $table,array $where,int $limit=NULL){}
 
 	/**
 	* Populates $this->_QUERY with proper syntax. Sets query type.
@@ -103,7 +91,7 @@ class Query{
 	* @since 1.0.0
 	* @param string (table)
 	*/
-	function generateDropQuery(string $table){ $this->$_QUERY_TYPE='drop'; }
+	function generateDropQuery(string $table){}
 
 	//---------------------------------------------------------------
 	// Predefined functions used by child classes.
@@ -172,5 +160,5 @@ class Query{
 
 }
 
-class InvalidQueryTypeException extends Exception {}
-class InvalidQueryValuesException extends Exception {}
+class InvalidQueryTypeException extends \Exception {}
+class InvalidQueryValuesException extends \Exception {}
