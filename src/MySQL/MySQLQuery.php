@@ -38,7 +38,7 @@ class MySQLQuery extends Query{
 	* @param string (operator shortcode)
 	*/
 	private function operatorToSyntax(string $operator){
-		switch (strtolower($shortcode)) {
+		switch (strtolower($operator)) {
 			case 'l':
 			case '%':
 				return " LIKE ";
@@ -77,7 +77,7 @@ class MySQLQuery extends Query{
 		foreach($values as $k => $v){
 
 			//Grab a shortcode from a value
-			preg_match('/^\[([A-z]+)\]/',$v,$matches);
+			preg_match('/^\[(.*)\]/',$v,$matches);
 
 			//Generate the operator
 			if(!empty($matches[1])){
@@ -87,7 +87,7 @@ class MySQLQuery extends Query{
 			}
 
 			//Add the syntax without a value
-			$s = $s.$k.$o."?";
+			$s = $s.$k.$o."? AND ";
 
 		}
 
@@ -183,16 +183,16 @@ class MySQLQuery extends Query{
 		// Base Syntax Generation
 		//-----------------------------
 
-		$q = "UPDATE ".$table." WHERE ";
+		$q = "UPDATE ".$table." SET ";
 
 		//Loop through key value pairs generating syntax.
-		$q = $q.$this->keyValuesToSyntax($where);
-		$q = $q." SET ";
 		$q = $q.$this->keyValuesToSyntax($values);
+		$q = $q." WHERE ";
+		$q = $q.$this->keyValuesToSyntax($where);
 
 		//Add all values in order to the returning params array for PDO.
-		foreach( $where as $k => $v ){ $result['params'][] = $v; }
 		foreach( $values as $k => $v ){ $result['params'][] = $v; }
+		foreach( $where as $k => $v ){ $result['params'][] = $v; }
 
 		// Add limit and/or offset if requested
 		if($limit !== NULL){
@@ -200,7 +200,7 @@ class MySQLQuery extends Query{
 			$result['params'][] = $limit;
 		}
 
-		$results['syntax'] = $q;
+		$result['syntax'] = $q;
 
 		return $result;
 

@@ -9,7 +9,7 @@
 
  		$query = new MySQLQuery();
 
- 		assertFalse((!$query instanceof MySQLQuery),"Failed to initialize MySQL Database object.");
+ 		$this->AssertFalse((!$query instanceof MySQLQuery),"Failed to initialize MySQL Database object.");
 
  	}
 
@@ -17,7 +17,7 @@
 
  		$query = new MySQLQuery();
 
- 		$a = "SELECT FROM test_table id,name,quantity WHERE color != ? AND color LIKE ? AND size > ? LIMIT ? OFFSET ?";
+ 		$a = "SELECT id,name,quantity FROM test_table WHERE color != ? AND size > ? LIMIT ? OFFSET ?";
 
  		$b = $query->generateSelectQuery(
  			"test_table",
@@ -28,7 +28,6 @@
  			),
  			array(
  				"color" => "[!=]blue",
- 				"color" => "[%]green",
  				"size" => "[>]20",
  			),
  			25,
@@ -36,7 +35,7 @@
  		);
 
  		$this->AssertEquals($a,$b['syntax']);
- 		$this->AssertEquals(5,count($b['params']));
+ 		$this->AssertEquals(4,count($b['params']));
 
  	}
 
@@ -86,16 +85,16 @@
 
  		$query = new MySQLQuery();
 
- 		$a = "UPDATE test_table SET color=?,quantity=? WHERE id=? LIMIT ?";
+ 		$a = "UPDATE test_table SET color = ? AND quantity = ? WHERE id = ? LIMIT ?";
 
  		$b = $query->generateUpdateQuery(
  			"test_table",
  			array(
- 				"color" => "red",
- 				"quantity" => "20",
+ 				"id" => 10,
  			),
  			array(
- 				"id" => 10,
+ 				"color" => "red",
+ 				"quantity" => "20",
  			),
  			1
  		);
