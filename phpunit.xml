@@ -10,7 +10,11 @@
          stopOnFailure="false">
     <testsuites>
         <testsuite name="MySQL">
-            <directory suffix=".php">/tests/mysql</directory>
+            <directory suffix=".php">tests/mysql</directory>
         </testsuite>
     </testsuites>
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+        </whitelist>
+    </filter>
 </phpunit>
