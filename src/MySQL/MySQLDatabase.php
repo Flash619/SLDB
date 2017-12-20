@@ -43,7 +43,7 @@ class MySQLDatabase extends Database{
 		try {
 			$syntax = $query->generateSelectQuery($table,$columns,$where,$limit,$offset);
 		} catch (Exception $e) {
-			return $this->fatalQueryError(e->getMessage());
+			return $this->fatalQueryError($e->getMessage());
 		}
 
 		//TODO PDO stuff.
