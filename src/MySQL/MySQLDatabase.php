@@ -42,7 +42,7 @@ class MySQLDatabase extends Database{
 		
 		try {
 			$syntax = $query->generateSelectQuery($table,$columns,$where,$limit,$offset);
-		} catch (Exception $e) {
+		}catch (Exception $e){
 			return $this->fatalQueryError($e->getMessage());
 		}
 
@@ -98,7 +98,7 @@ class MySQLDatabase extends Database{
 
 		try{
 			$syntax = $query->generateCreateQuery($table,$fields);
-		}catch(Exception $e)
+		}catch(Exception $e){
 			return $this->fatalQueryError($e->getMessage());
 		}
 
@@ -136,7 +136,7 @@ class MySQLDatabase extends Database{
 
 		try{
 			$syntax = $query->generateDropQuery($table);
-		}catch(Exception $e)
+		}catch(Exception $e){
 			return $this->fatalQueryError($e->getMessage());
 		}
 
