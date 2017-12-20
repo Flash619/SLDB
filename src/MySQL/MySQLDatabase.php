@@ -80,7 +80,7 @@ class MySQLDatabase extends Database{
 		try{
 			$syntax = $query->generateInsertQuery($table,$values);
 		}catch(Exception $e){
-			return $this->fatalQueryError(e->getMessage());
+			return $this->fatalQueryError($e->getMessage());
 		}
 
 		//TODO PDO stuff.
@@ -99,7 +99,7 @@ class MySQLDatabase extends Database{
 		try{
 			$syntax = $query->generateCreateQuery($table,$fields);
 		}catch(Exception $e)
-			return $this->fatalQueryError(e->getMessage());
+			return $this->fatalQueryError($e->getMessage());
 		}
 
 		//TODO PDO stuff.
