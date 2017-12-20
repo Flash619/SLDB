@@ -69,31 +69,45 @@ class MySQLQuery extends Query{
 		}
 	}
 
-	private function keyValuesToSyntax(array $values){
+	private function keyValuesToSyntaxArray(array $values){
 
-		$s = '';
+		$r = array(
+			'syntax' => '',
+			'params' => ''
+		);
 
 		//Loop through key/value pairs
 		foreach($values as $k => $v){
+
+			$hasOperator = false;
 
 			//Grab a shortcode from a value
 			preg_match('/^\[(.*)\]/',$v,$matches);
 
 			//Generate the operator
 			if(!empty($matches[1])){
+				$hasOperator = true;
 				$o = $this->operatorToSyntax($matches[1]);
 			}else{
 				$o = " = ";
 			}
 
 			//Add the syntax without a value
-			$s = $s.$k.$o."? AND ";
+			$r['syntax'] = $r['syntax'].$k.$o."? AND ";
+
+			//If the value has an operator, remove it before storing the value.
+			if($hasOperator){
+				preg_match('/^\[.*\](.*)/',$v,$matches);
+				$r['params'][] = $matches[1];
+			}else{
+				$r['params'][] = $v;
+			}
 
 		}
 
-		$s = rtrim($s,' AND ');
+		$r['syntax'] = rtrim($r['syntax'],' AND ');
 
-		return $s;
+		return $r;
 
 	}
 
@@ -111,33 +125,38 @@ class MySQLQuery extends Query{
 	*/
 	function generateSelectQuery(string $table,array $columns,array $where,int $limit=NULL,int $offset=NULL){
 
-		$result = array();
-		$result['params'] = array();
-		$result['syntax'] = "";
-
 		//-----------------------------
 		// Query Validation
 		//-----------------------------
-
-		//vCall parent class function first for back end stuff.
-		Query::generateSelectQuery($table,$columns,$where,$limit,$offset);
 
 		if(empty($table) || empty($columns) || empty($where)){
 			throw new InvalidQueryValuesException("Required values not met.");
 		}
 
 		//-----------------------------
+		// Variable Initialization
+		//-----------------------------
+
+		//Call parent class function first for back end stuff.
+		Query::generateSelectQuery($table,$columns,$where,$limit,$offset);
+
+		// Setup resulting arrays.
+		$result = array();
+		$result['params'] = array();
+		$result['syntax'] = "";
+
+		// Convert $where to key value syntax array.
+		$where = $this->keyValuesToSyntaxArray($where);
+
+		// Append where params to result params.
+		$result['params'] = $where['params'];
+
+		//-----------------------------
 		// Base Syntax Generation
 		//-----------------------------
 
 		// Start initial query syntax
-		$q = "SELECT ".implode(",",$columns)." FROM ".$table." WHERE ";
-
-		//Loop through key value pairs generating syntax.
-		$q = $q.$this->keyValuesToSyntax($where);
-
-		//Add all values in order to the returning params array for PDO.
-		foreach( $where as $k => $v ){ $result['params'][] = $v; }
+		$q = "SELECT ".implode(",",$columns)." FROM ".$table." WHERE ".$where['syntax'];
 
 		// Add limit and/or offset if requested
 		if($limit !== NULL){
@@ -164,13 +183,6 @@ class MySQLQuery extends Query{
 	*/
 	function generateUpdateQuery(string $table,array $where,array $values,int $limit=NULL){
 
-		// Call parent class function first for back end stuff.
-		Query::generateUpdateQuery($table,$where,$values,$limit);
-
-		$result = array();
-		$result['params'] = array();
-		$result['syntax'] = "";
-
 		//-----------------------------
 		// Query Validation
 		//-----------------------------
@@ -180,19 +192,34 @@ class MySQLQuery extends Query{
 		}
 
 		//-----------------------------
+		// Variable Initialization
+		//-----------------------------
+
+		// Call parent class function first for back end stuff.
+		Query::generateUpdateQuery($table,$where,$values,$limit);
+
+		// Setup resulting arrays.
+		$result = array();
+		$result['params'] = array();
+		$result['syntax'] = "";
+
+		// Convert $where and $value to key value syntax arrays.
+		$values = $this->keyValuesToSyntaxArray($values);
+		$where = $this->keyValuesToSyntaxArray($where);
+
+		// Append value and where params to result params.
+		$result['params'] = array_merge($values['params'],$where['params']);
+
+		//-----------------------------
 		// Base Syntax Generation
 		//-----------------------------
 
 		$q = "UPDATE ".$table." SET ";
 
 		//Loop through key value pairs generating syntax.
-		$q = $q.$this->keyValuesToSyntax($values);
+		$q = $q.$values['syntax'];
 		$q = $q." WHERE ";
-		$q = $q.$this->keyValuesToSyntax($where);
-
-		//Add all values in order to the returning params array for PDO.
-		foreach( $values as $k => $v ){ $result['params'][] = $v; }
-		foreach( $where as $k => $v ){ $result['params'][] = $v; }
+		$q = $q.$where['syntax'];
 
 		// Add limit and/or offset if requested
 		if($limit !== NULL){
@@ -214,21 +241,25 @@ class MySQLQuery extends Query{
 	*/
 	function generateInsertQuery(string $table,array $values){
 
-		// Call parent class function first for back end stuff.
-		Query::generateInsertQuery($table,$values);
-
-		$result = array();
-		$result['params'] = array();
-		$result['syntax'] = "";
-
 		//-----------------------------
 		// Query Validation
 		//-----------------------------
 
-
 		if(empty($table) || empty($values)){
 			throw new InvalidQueryValuesException("Required values not met.");
 		}
+
+		//-----------------------------
+		// Variable Initialization
+		//-----------------------------
+
+		// Call parent class function first for back end stuff.
+		Query::generateInsertQuery($table,$values);
+
+		// Setup resulting arrays.
+		$result = array();
+		$result['params'] = array();
+		$result['syntax'] = "";
 		
         //-----------------------------
 		// Base Syntax Generation
@@ -271,16 +302,24 @@ class MySQLQuery extends Query{
 	*/
 	function generateCreateQuery(string $table,array $fields){
 
+		//-----------------------------
+		// Query Validation
+		//-----------------------------
+
+		if(empty($table) || empty($fields)){
+			throw new InvalidQueryValuesException("Required values not met.");
+		}
+
+		//-----------------------------
+		// Variable Initialization
+		//-----------------------------
+
 		// Call parent class function first for back end stuff.
 		Query::generateCreateQuery($table,$fields);
 
 		$result = array();
 		$result['params'] = array();
 		$result['syntax'] = "";
-
-		if(empty($table) || empty($fields)){
-			throw new InvalidQueryValuesException("Required values not met.");
-		}
 
 	}
 
@@ -292,13 +331,6 @@ class MySQLQuery extends Query{
 	*/
 	function generateDeleteQuery(string $table,array $where,int $limit=NULL){
 
-		$result = array();
-		$result['params'] = array();
-		$result['syntax'] = "";
-
-		// Call parent class function first for back end stuff.
-		Query::generateDeleteQuery($table,$where,$limit);
-         
   		//-----------------------------
 		// Query Validation
 		//-----------------------------
@@ -307,17 +339,29 @@ class MySQLQuery extends Query{
 			throw new InvalidQueryValuesException("Required values not met.");
 		}
 
-        	 //-----------------------------
-		// Base Syntax GenerationW
+		//-----------------------------
+		// Variable Initialization
 		//-----------------------------
 
-		$q = "DELETE FROM ".$table." WHERE ".$this->keyValuesToSyntax($where);
-	
-		foreach($where as $k => $v){
+		// Call parent class function first for back end stuff.
+		Query::generateDeleteQuery($table,$where,$limit);
 
-			$result['params'][] = $v;
+		// Setup resulting arrays.
+		$result = array();
+		$result['params'] = array();
+		$result['syntax'] = "";
 
-    		}
+		// Convert $where to key value syntax array.
+		$where = $this->keyValuesToSyntaxArray($where);
+
+		// Append where params to result params.
+		$result['params'] = $where['params'];
+
+        //-----------------------------
+		// Base Syntax Generation
+		//-----------------------------
+
+		$q = "DELETE FROM ".$table." WHERE ".$where['syntax'];
 
 		// Add limit and/or offset if requested
 		if($limit !== NULL){
@@ -339,16 +383,24 @@ class MySQLQuery extends Query{
 	*/
 	function generateDropQuery(string $table){
 
-		$result = array();
-		$result['params'] = array();
-		$result['syntax'] = "";
-
-		// Call parent class function first for back end stuff.
-		Query::generateDropQuery($table);
+  		//-----------------------------
+		// Query Validation
+		//-----------------------------
 
 		if(empty($table)){
 			throw new InvalidQueryValuesException("Required values not met.");
 		}
+
+		//-----------------------------
+		// Variable Initialization
+		//-----------------------------
+
+		// Call parent class function first for back end stuff.
+		Query::generateDropQuery($table);
+
+		$result = array();
+		$result['params'] = array();
+		$result['syntax'] = "";
 
 	}
 

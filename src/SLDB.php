@@ -233,8 +233,8 @@ class SLDB{
 
 }
 
-class InvalidConfigurationValueException extends Exception{}
-class InvalidConfigurationOptionException extends Exception{}
-class InvalidConfigurationException extends Exception{}
-class InvalidDatabaseTypeException extends Exception{}
-class NotYetImplementedException extends Exception{}
+class InvalidConfigurationValueException extends \Exception{}
+class InvalidConfigurationOptionException extends \Exception{}
+class InvalidConfigurationException extends \Exception{}
+class InvalidDatabaseTypeException extends \Exception{}
+class NotYetImplementedException extends \Exception{}

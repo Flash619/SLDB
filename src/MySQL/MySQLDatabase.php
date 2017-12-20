@@ -33,7 +33,7 @@ class MySQLDatabase extends Database{
 	// Public functions
 	//---------------------------------------------------------------	
 
-	function select(string $table,array $columns,array $where,integer $limit=NULL,integer $offset=NULL){
+	function select(string $table,array $columns,array $where,int $limit=NULL,int $offset=NULL){
 
 		$query  = new MySQLQuery();
 		$syntax = '';
@@ -51,7 +51,7 @@ class MySQLDatabase extends Database{
 		return $result;
 	}
 
-	function update(string $table,array $where,array $values,integer $limit=NULL){
+	function update(string $table,array $where,array $values,int $limit=NULL){
 
 		$query = new MySQLQuery();
 		$syntax = '';
@@ -108,7 +108,7 @@ class MySQLDatabase extends Database{
 		
 	}
 
-	function delete(string $table,array $where,integer $limit=NULL){
+	function delete(string $table,array $where,int $limit=NULL){
 
 		$query = new MySQLQuery();
 		$syntax = '';

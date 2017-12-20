@@ -34,8 +34,10 @@
  			10
  		);
 
- 		$this->AssertEquals($a,$b['syntax']);
- 		$this->AssertEquals(4,count($b['params']));
+ 		$this->AssertEquals($a,$b['syntax'],"Generated query syntax did not match expected query syntax.");
+ 		$this->AssertEquals(4,count($b['params']),"Param count did not equal expected return count.");
+ 		$this->AssertEquals("blue",$b['params'][0],"Expected param did not match actual param returned.");
+ 		$this->AssertEquals("20",$b['params'][1],"Expected param did not match actual param returned.");
 
  	}
 
@@ -55,8 +57,8 @@
  			)
  		);
 
- 		$this->AssertEquals($a,$b['syntax']);
- 		$this->AssertEquals(4,count($b['params']));
+ 		$this->AssertEquals($a,$b['syntax'],"Generated query syntax did not match expected query syntax.");
+ 		$this->AssertEquals(4,count($b['params']),"Param count did not equal expected return count.");
 
  	}
 
@@ -76,8 +78,8 @@
  			1
  		);
 
- 		$this->AssertEquals($a,$b['syntax']);
- 		$this->AssertEquals(4,count($b['params']));
+ 		$this->AssertEquals($a,$b['syntax'],"Generated query syntax did not match expected query syntax.");
+ 		$this->AssertEquals(4,count($b['params']),"Param count did not equal expected return count.");
 
  	}
 
@@ -99,8 +101,8 @@
  			1
  		);
 
- 		$this->AssertEquals($a,$b['syntax']);
- 		$this->AssertEquals(4,count($b['params']));
+ 		$this->AssertEquals($a,$b['syntax'],"Generated query syntax did not match expected query syntax.");
+ 		$this->AssertEquals(4,count($b['params']),"Param count did not equal expected return count.");
 
  	}
 
