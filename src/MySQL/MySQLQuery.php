@@ -73,7 +73,7 @@ class MySQLQuery extends Query{
 
 		$r = array(
 			'syntax' => '',
-			'params' => ''
+			'params' => array()
 		);
 
 		//Loop through key/value pairs
