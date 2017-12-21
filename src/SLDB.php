@@ -9,47 +9,32 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-
 namespace SLDB;
 
-use SLDB\Base\Database;
-use SLDB\MySQL\MySQLDatabase;
+use SLDB\Base\Query as BaseQuery;
+use SLDB\MySQL\Database as MySQLDatabase;
 
-/**
-* SLDB Is a slim, lightweight database library for PHP. This main class works as a loader for the database as well
-* as initializing queries against any loaded database configuration. The class is mearly a means of abstraction for
-* all other database and query types, and routes requests accordignly based on the provided configuration.
-* @author Travis Truttschel
-* @version 1.0.0
-* @since 1.0.0
-* @param array (optional)
-* @license MIT
-*/
 class SLDB{
-
-	//---------------------------------------------------------------
-	// Private member variables.
-	//---------------------------------------------------------------
 
 	/**
 	* The configuration array for SLDB
 	*/
-	private $_CONFIG;
+	private $_config;
 
 	/**
 	* An array of valid configuration parameters for SDLB
 	*/
-	private $_VALID_CONFIG_PARAMS;
+	private $_valid_config_params;
 
 	/**
 	* An array of required configuration parameters for SLDB
 	*/
-	private $_REQUIRED_CONFIG_PARAMS;
+	private $_required_config_params;
 
 	/**
 	* The active database object used for queries
 	*/
-	private $_DATABASE;
+	private $_database;
 
 	/**
 	* Class Constructor
@@ -57,22 +42,27 @@ class SLDB{
 	function __construct(array $config=array()){
 
 		//Define member variables
-		$this->_CONFIG       =   array();
+		$this->_config = array();
+
 		$params = array(
 			'database_type',
 			'database_name',
 			'database_host',
 			'database_user',
 			'database_pass');
-		$this->_VALID_CONFIG_PARAMS = $params;
-		$this->_REQUIRED_CONFIG_PARAMS = $params;
-		$this->_DATABASE     =   NULL;
+
+		$this->_valid_config_params = $params;
+		$this->_required_config_params = $params;
 
 		//Setup SLDB if a config is supplied
-		if(empty($config)){
+		if( empty($config) ){
+
 			return;
+
 		}else{
+
 			$this->setConfig($config);
+
 		}
 
 	}
@@ -82,10 +72,6 @@ class SLDB{
 	*/
 	function __destruct(){}
 
-	//---------------------------------------------------------------
-	// Private member functions.
-	//---------------------------------------------------------------
-	
 	/**
 	* Imports a configuration array to SLDB and verifies the accuracy of configuration keys
 	* as well as sets up required classes/variables within SLDS to match the supplied
@@ -93,7 +79,7 @@ class SLDB{
 	* @author Travis Truttschel
 	* @since 1.0.0
 	* @param array
-	* @throws InvalidConfigurationOptionException InvalidConfigurationValueException InvalidConfigurationExceiption
+	* @throws InvalidConfigurationExceiption
 	*/
 	private function setConfig(array $config){
 
@@ -104,137 +90,140 @@ class SLDB{
 		$matchedParams = array();
 
 		//Loop through all $config as $k (key) $v (value)
-		foreach($config as $k => $v){
+		foreach( $config as $k => $v ){
 
-			//IF $k exists within _REQUIRED_CONFIG_PARAMS
-			if(in_array($k, $this->_REQUIRED_CONFIG_PARAMS)){
+			//IF $k exists within _required_config_params
+			if( in_array( $k, $this->_required_config_params ) ){
 
 				//IF $v is not set or null.
-				if(empty($v)){
-					throw new InvalidConfigurationValueException();
+				if( empty($v) ){
+					throw new InvalidConfigurationException();
 				}else{
 					$matchedParams[] = $k;
 				}
 
 			}
 
-			//IF $k does not exist within _VALID_CONFIG_PARAMS
-			if(!in_array($k, $this->_VALID_CONFIG_PARAMS)){
-				throw new InvalidConfigurationOptionException();
+			//IF $k does not exist within _valid_config_params
+			if( ! in_array( $k, $this->_valid_config_params ) ){
+				throw new InvalidConfigurationException();
 			}
 
 		}
 
-		//IF $matchedParams does not equal _REQUIRED_CONFIG_PARAMS
-		if($matchedParams != $this->_REQUIRED_CONFIG_PARAMS){
+		//IF $matchedParams does not equal _required_config_params
+		if( $matchedParams != $this->_required_config_params ){
 			throw new InvalidConfigurationException();
 		}
-		
+
 		//Initialize based on database type
-		switch(strtolower($config['database_type'])){
+		switch( strtolower( $config['database_type'] ) ){
 			case 'mysql':
-				$this->_DATABASE = new MySQLDatabase();
+				$this->_database = new MySQLDatabase($this->_config);
 				break;
 			default:
-				throw new InvalidDatabaseTypeException();
+				throw new InvalidConfigurationException("Database type not supported.");
 		}
 
 		//Save config for future reference
-		$this-$_CONFIG = $config;
+		$this-$_config = $config;
 
 	}
 
-
-	//---------------------------------------------------------------
-	// Public member functions.
-	//---------------------------------------------------------------
-
-	/**
-	* Used for returning the database object to the user directly.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @return SLDB\Base\Database || NULL
-	*/
 	function getDatabase(){
 
-		return $this->_DATABASE;
+		return $this->_database;
 
 	}
 
-	/**
-	* Accesses the select function of the current database.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @param string (table), array (columns), array (where), integer (limit)
-	* @return array (results) || NULL
-	*/
-	function select(string $table,array $columns,array $where,integer $limit=NULL,integer $offset=NULL){
-
-		if( $this->$_DATABASE instanceof Database ){
-			return $this->$_DATABASE->select($columns,$table,$where,$limit,$offset);
-		}
-
-		return NULL;
-
-
-	}
-
-	/**
-	* Accesses the insert function of the current database.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @param string (table), array (row)
-	* @return array (results) || NULL
-	*/
-	function insert(string $table,array $values){
-
-		if( $this->$_DATABASE instanceof Database ){
-			return $this->$_DATABASE->insert($table,$values);
-		}
-
-		return NULL;
+	function select(string $table=NULL,array $fields=NULL,array $operator=NULL,int $limit=NULL,int $offset=NULL){
 		
+		if( $table === NULL || $fields === NULL || $conditions === NULL ){return NULL;}
+
+		$query = $this->_database->initQuery(QueryType::SELECT);
+
+		$query->setTable($table);
+		$query->addFields($fields);
+		$query->addOperator($operator);
+		$query->setLimit($limit);
+		$query->setOffset($offset);
+
+		$query->generate();
+
+		$result = $this->_database->execute($query);
+
+		return $result;
+
 	}
 
-	/**
-	* Accesses the create function of the current database.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @param string (table), array (fields)
-	* @return array (results) || NULL
-	*/
-	function create(string $table,array $fields){ throw new NotYetImplementedException(); }
+	function update(string $table=NULL,array $values=NULL,array $operator=NULL,int $limit=NULL,int $offset=NULL){
 
-	/**
-	* Accesses the delete function of the current database.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @param string (table), array (where), integer (limit)
-	* @return array (results) || NULL
-	*/
-	function delete(string $table,array $where,integer $limit=NULL){
+		if( $table === NULL || $values === NULL || $conditions === NULL ){return NULL;}
 
-		if( $this->$_DATABASE instanceof Database ){
-			return $this->$_DATABASE->delete($table,$where,$limit);
-		}
+		$query = $this->_database->initQuery(QueryType::UPDATE);
 
-		return NULL;
-		
+		$query->setTable($table);
+		$query->addValues($values);
+		$query->addOperator($operator);
+		$query->setLimit($limit);
+		$query->setOffset($offset);
+
+		$query->generate();
+
+		$result = $this->_database->execute($query);
+
+		return $result;
+
 	}
 
-	/**
-	* Accesses the drop function of the current database.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @param string (table)
-	* @return array (results) || NULL
-	*/
-	function drop(string $table){ throw new NotYetImplementedException(); }
+	function insert(string $table=NULL,array $values=NULL){
+
+		if( $table === NULL || $values === NULL ){return NULL;}
+
+		$query = $this->_database->initQuery(QueryType::INSERT);
+
+		$query->setTable($table);
+		$query->addValues($values);
+
+		$query->generate();
+
+		$result = $this->_database->execute($query);
+
+		return $result;
+
+	}
+
+	function delete(string $table=NULL,array $operator=NULL,int $limit=NULL,int $offset=NULL){
+
+		if( $table === NULL || $conditions === NULL ){return NULL;}
+
+		$query = $this->_database->initQuery(QueryType::DELETE);
+
+		$query->setTable($table);
+		$query->addOperator($operator);
+		$query->setLimit($limit);
+		$query->setOffset($offset);
+
+		$query->generate();
+
+		$result = $this->_database->execute($query);
+
+		return $result;
+
+	}
+
+	function create(){
+
+		throw new FunctionNotYetSupportedException();
+
+	}
+
+	function drop(){
+
+		throw new FunctionNotYetSupportedException();
+
+	}
 
 }
-
-class InvalidConfigurationValueException extends \Exception{}
-class InvalidConfigurationOptionException extends \Exception{}
 class InvalidConfigurationException extends \Exception{}
-class InvalidDatabaseTypeException extends \Exception{}
-class NotYetImplementedException extends \Exception{}
+class FunctionNotYetSupportedException extends \Exception{}

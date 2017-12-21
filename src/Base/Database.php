@@ -1,36 +1,28 @@
 <?php
+
 namespace SLDB\Base;
 
-/**
-* This Database class is inherited by other Database class types and is used for general abstraction. This is more
-* useful for someone who may be loading multiple databases with SLDB at once, or checking to see if a variable is
-* a valid SLDB database object type. 
-* @author Travis Truttschel
-* @since 1.0.0
-*/
+use SLDB\Base\Query as BaseQuery;
+
+class DatabaseType{
+	const MYSQL      = 1;
+	const POSTGRESQL = 2;
+	const MONGODB    = 3;
+}
+
 class Database{
 
-	//---------------------------------------------------------------
-	// Protected member variables.
-	//---------------------------------------------------------------
-
-	/**
-	* Whether this database is configed and ready.
-	*/
-	protected $_CONFIGURED;
-
-	/**
-	* What type of database this is.
-	*/
-	protected $_DATABASE_TYPE;
+	protected $_type;
+	protected $_config;
 
 	/**
 	* Class Constructor
 	*/
-	function __construct(){
-		$this->_CONFIGURED    = false;
-		$this->_DATABASE_TYPE = NULL;
-		$this->_LAST_ERROR    = NULL;
+	function __construct(array $config=NULL){
+
+		$this->_config = $config;
+		$this->_type = NULL;
+
 	}
 
 	/**
@@ -38,65 +30,37 @@ class Database{
 	*/
 	function __destruct(){}
 
-	//---------------------------------------------------------------
-	// Public Functions to be overriden by child classes.
-	//---------------------------------------------------------------
+	function getType(){
 
-	function select(string $table,array $columns,array $where,int $limit=NULL,int $offset=NULL){}
-
-	function update(string $table,array $where,array $values,int $limit=NULL){}
- 
-	function insert(string $table,array $values){}
-
-	function create(string $table,array $fields){}
-
-	function delete(string $table,array $where,int $limit=NULL){}
-
-	function drop(string $table){}
-
-	//---------------------------------------------------------------
-	// Public Functions
-	//---------------------------------------------------------------	
-
-	/**
-	* Returns whether this database has been configured.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @return boolean
-	*/
-	function isConfigured(){ 		
-		return $this->$_CONFIGURED; 
-	}
-
-	/**
-	* Returns the type of database this database is using.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @return string || NULL
-	*/
-	function getDatabaseType(){
-		return $this->$_DATABASE_TYPE;
-	}
-
-	//---------------------------------------------------------------
-	// Protected functions
-	//---------------------------------------------------------------	
-
-	//---------------------------------------------------------------
-	// Private functions
-	//---------------------------------------------------------------	
-
-	private function fatalQueryError($error){
-
-		$result                    = array();
-		$errors                    = array();
-		$errors[]                  = "Failed to generate query syntax.";
-		$result['errors']          = $errors;
-		$result['rows']            = NULL;
-		$result['rows_affected']   = NULL;
-
-		return $result;
+		return $this->_type;
 
 	}
+
+	function initQuery(int $type=NULL){
+
+		return new BaseQuery($this,$type);
+
+	}
+
+	function isConfigured(){
+
+		if( $this->_config === NULL && ! is_array($this->_config) ){
+
+			return false;
+
+		}
+
+		return true;
+
+	}
+
+	protected function setType(int $type){
+
+		$this->$_type = $type;
+
+	}
+
+
+	function execute(BaseQuery $query){}
 
 }

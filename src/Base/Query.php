@@ -1,164 +1,249 @@
 <?php
+
 namespace SLDB\Base;
 
-/**
-* This is the Base Query class inherited by all other Query classes.
-* @author Travis Truttschel
-* @since 1.0.0
-*/
+use SLDB\Base\Database as BaseDatabase;
+use SLDB\Operator;
+
+class QueryType{
+	const SELECT  = 1;
+	const UPDATE  = 2;
+	const INSERT  = 3;
+	const DELETE  = 4;
+	const CREATE  = 5;
+	const DROP    = 6;
+}
+
 class Query{
 
-	//---------------------------------------------------------------
-	// Protected member variables.
-	//---------------------------------------------------------------
+	protected $_database;
+	protected $_table;
+	protected $_type;
 
-	/**
-	* Current database type.
-	*/
-	protected $_DATABASE_TYPE;
+	protected $_fields;
+	protected $_field_values;
+	protected $_operator;
+	protected $_limit;
+	protected $_offset;
+
+	protected $_syntax;
+	protected $_params;
+
+	protected $_rows_returned;
+	protected $_rows_affected;
+	protected $_message;
+	protected $_error;
 
 	/**
 	* Class Constructor
 	*/
-	function __construct(){
+	function __construct(BaseDatabase $database=NULL,int $type=NULL){
 
-		$this->_DATABASE_TYPE = NULL;
+		if($database !== NULL){
+
+			$this->setDatabase($database);
+		}
+
+		if($type !== NULL){
+
+			$this->setType($type);
+
+		}
 
 	}
 
 	/**
-	* Class Constructor
+	* Class Deconstructor
 	*/
 	function __destruct(){}
 
-	//---------------------------------------------------------------
-	// Standard functions to be overidden per child class.
-	//---------------------------------------------------------------
+	function addFields(array $fields){
 
-	/**
-	* Validates the user provided query array to insure accuracy. Returns true if the provided
-	* array is valid, otherwise false will be returned.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @param array
-	* @return boolean
-	*/
-	protected function validateQueryArray(array $query){}
+		$this->_fields = array_merge($this->_fields,$fields);
+		
+	}
 
-	/**
-	* Populates $this->_QUERY with proper syntax. Sets query type.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @param string (table), array (columns), array (where), integer (limit)
-	*/
-	function generateSelectQuery(string $table,array $columns,array $where,int $limit=NULL,int $offset=NULL){}
 
-	/**
-	* Populates $this->_QUERY with proper syntax. Sets query type.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @param string (table), array (where), array (values), integer (limit)
-	*/
-	function generateUpdateQuery(string $table,array $where,array $values,int $limit=NULL){}
+	function addField(string $field){
 
-	/**
-	* Populates $this->_QUERY with proper syntax. Sets query type.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @param string (table), array (row)
-	*/
-	function generateInsertQuery(string $table,array $row){}
+		$this->_fields[] = $field;
+		
+	}
 
-	/**
-	* Populates $this->_QUERY with proper syntax. Sets query type.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @param string (table), array (fields)
-	*/
-	function generateCreateQuery(string $table,array $fields){}
+	function addValue(string $field, string $value){
 
-	/**
-	* Populates $this->_QUERY with proper syntax. Sets query type.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @param string (table), array (where), integer (limit)
-	*/
-	function generateDeleteQuery(string $table,array $where,int $limit=NULL){}
+		$this->_field_values[$field] = $value;
 
-	/**
-	* Populates $this->_QUERY with proper syntax. Sets query type.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @param string (table)
-	*/
-	function generateDropQuery(string $table){}
+	}
 
-	//---------------------------------------------------------------
-	// Predefined functions used by child classes.
-	//---------------------------------------------------------------	
+	function addValues(array $field_values){
 
-	/**
-	* Checks to see if an array has any empty values. This function can call itself if it finds
-	* any nested arrays. Returns true if no values in the array(s) are empty, otherwaise false
-	* will be returned.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @param array
-	* @return boolean
-	*/
-	protected function noEmptyValues(array $array){
+		$this->_field_values = array_merge($this->_field_values,$field_values);
 
-		foreach( $array as $k =>$v ){
-			if(empty($v)){
-				return false;
-			}
-			if(is_array($v)){
-				if(!$this->noEmptyValues($v)){
-					return false;
-				}
-			}
+	}
+
+	function setOperator(Operator $operator){
+
+		$this->_operator[] = $operator;
+
+	}
+
+	function setLimit(int $limit){
+
+		$this->_limit = $limit;
+
+	}
+
+	function setOffset(int $offset){
+
+		$this->_offset = $offset;
+
+	}
+
+	function setType(int $type){
+
+		$this->_type = $type;
+
+	}
+
+	function setDatabase(BaseDatabase $database){
+
+		$this->_database = $database;
+
+	}
+
+	function setTable(string $table){
+
+		$this->_table = $table;
+
+	}
+
+	function getRowsReturned(){
+
+		return $this->_rows_returned;
+
+	}
+
+	function getRowsAffected(){
+
+		return $this->_rows_affected;
+
+	}
+
+	function getError(){
+
+		return $this->_error;
+
+	}
+
+	function getMessage(){
+
+		return $this->_message;
+
+	}
+
+	function getType(){
+
+		return $this->_type;
+
+	}
+
+	function getDatabase(){
+
+		return $this->_database;
+
+	}
+
+	function getTable(){
+
+		return $this->_table;
+
+	}
+
+	function getSyntax(){
+
+		return $this->_syntax;
+
+	}
+
+	function getParams(){
+
+		return $this->_params;
+
+	}
+
+	function getOperator(){
+
+		return $this->_operator;
+
+	}
+
+	function hasError(){
+
+		if( $this->_error !== NULL ){
+
+			return true;
+
 		}
 
-		return true;
+		return false;
 
 	}
 
+	function hasMessage(){
 
-	//---------------------------------------------------------------
-	// Public functions
-	//---------------------------------------------------------------	
+		if( $this->_message !== NULL ){
 
-	/**
-	* Returns the formatted raw query syntax for this query.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @return string || NULL
-	*/
-	function getQuerySyntax(){
-		return $this->_QUERY;
+			return true;
+
+		}
+
+		return false;
 	}
 
-	/**
-	* Returns the type of query stored within this query.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @return string || NULL
-	*/
-	function getQueryType(){
-		return $this->_QUERY_TYPE;
+    function generate(){
+
+		switch($this->_type){
+			QueryType::SELECT:
+				$this->generateSelectSyntax();
+				break;
+			QueryType::UPDATE:
+				$this->generateUpdateSyntax();
+				break;
+			QueryType::INSERT:
+				$this->generateInsertSyntax();
+				break;
+			QueryType::DELETE:
+				$this->generateDeleteSyntax();
+				break;
+			QueryType::CREATE:
+				$this->generateCreateSyntax();
+				break;
+			QueryType::DROP:
+				$this->generateDropSyntax();
+				break;
+			default:
+				throw new InvalidQueryTypeException();
+		}
+
 	}
 
-	/**
-	* Returns the database type this query is designed for.
-	* @author Travis Truttschel
-	* @since 1.0.0
-	* @return string || NULL
-	*/
-	function getDatabaseType(){
-		return $this->_DATABASE_TYPE;
-	}
+	protected function parseOperator(Operator $operator){}
+
+	protected function generateSelectSyntax(){}
+
+	protected function generateUpdateSyntax(){}
+
+	protected function generateInsertSyntax(){}
+
+	protected function generateDeleteSyntax(){}
+
+	protected function generateCreateSyntax(){}
+
+	protected function generateDropSyntax(){}
+
+	function execute(BaseDatabase $database=NULL){}
 
 }
-
-class InvalidQueryTypeException extends \Exception {}
-class InvalidQueryValuesException extends \Exception {}
+class InvalidQueryTypeException extends \Exception{}
+class InvalidOperatorException extends \Exception{}
