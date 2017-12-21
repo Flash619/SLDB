@@ -12,6 +12,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 namespace SLDB;
 
 use SLDB\Base\Query as BaseQuery;
+use SLDB\Base\Database as BaseDatabase;
 use SLDB\MySQL\Database as MySQLDatabase;
 
 class SLDB{
@@ -57,7 +58,7 @@ class SLDB{
 		//Setup SLDB if a config is supplied
 		if( empty($config) ){
 
-			return;
+			throw new InvalidConfigurationException();
 
 		}else{
 
@@ -120,6 +121,7 @@ class SLDB{
 		switch( strtolower( $config['database_type'] ) ){
 			case 'mysql':
 				$this->_database = new MySQLDatabase($this->_config);
+				$config['database_type'] = DatabaseType::MYSQL;
 				break;
 			default:
 				throw new InvalidConfigurationException("Database type not supported.");

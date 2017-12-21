@@ -17,6 +17,7 @@ class QueryType{
 class Query{
 
 	protected $_database;
+	protected $_database_type;
 	protected $_table;
 	protected $_type;
 
@@ -148,6 +149,12 @@ class Query{
 
 	}
 
+	function getDatabaseType(){
+
+		return $this->_database_type;
+
+	}
+
 	function getDatabase(){
 
 		return $this->_database;
@@ -228,7 +235,9 @@ class Query{
 
 	}
 
-	protected function parseOperator(Operator $operator){}
+	protected function operatorToSyntax(Operator $operator){}
+
+	protected function valuesToSyntax(array $values){}
 
 	protected function generateSelectSyntax(){}
 
@@ -241,8 +250,6 @@ class Query{
 	protected function generateCreateSyntax(){}
 
 	protected function generateDropSyntax(){}
-
-	function execute(BaseDatabase $database=NULL){}
 
 }
 class InvalidQueryTypeException extends \Exception{}
