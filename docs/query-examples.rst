@@ -101,7 +101,7 @@ Updating Data
        'orders',
    		array(
     		'first_name' => '[l]john',
-    		'last_name' => array([l]doe','||','[!]smith'),
+    		'last_name' => array('[l]doe','||','[!]smith'),
     	),
     	array(
     		'first_name' => 'jane',
