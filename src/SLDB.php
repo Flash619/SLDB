@@ -146,7 +146,7 @@ class SLDB{
 
 		$query->setTable($table);
 		$query->addFields($fields);
-		$query->addOperator($operator);
+		$query->setOperator($operator);
 		$query->setLimit($limit);
 		$query->setOffset($offset);
 
@@ -166,7 +166,7 @@ class SLDB{
 
 		$query->setTable($table);
 		$query->addValues($values);
-		$query->addOperator($operator);
+		$query->setOperator($operator);
 		$query->setLimit($limit);
 		$query->setOffset($offset);
 
@@ -202,7 +202,7 @@ class SLDB{
 		$query = $this->_database->initQuery(QueryType::DELETE);
 
 		$query->setTable($table);
-		$query->addOperator($operator);
+		$query->setOperator($operator);
 		$query->setLimit($limit);
 		$query->setOffset($offset);
 

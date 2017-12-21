@@ -1,7 +1,7 @@
  <?php
 
  use PHPUnit\Framework\TestCase;
- use SLDB\MySQL\MySQLQuery;
+ use SLDB\MySQL\Query as MySQLQuery;
 
  class MySQLQueryTest extends TestCase{
 
