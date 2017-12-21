@@ -1,12 +1,14 @@
+.. _query-syntax:
+
 Query Syntax
 ============
 
 Query Concepts
 --------------
 
-When deciding how to structure queries, SLDB tries to make it as natural feeling as possible. To do this we tried to follow standard query syntax while adding standardization to the order of arguments required.
+When deciding how to structure queries, the developers of SLDB tried to make it as natural feeling as possible. To do this we tried to follow standard MySQL query syntax while adding standardization to the order of arguments required.
 
-Queries are initialized by a call to a *query function* within the *SLDB Object*. Most basic queries will use *query functions* that are named after the queries primary operator or command. Basic queries such as select, insert, delete, and update can be called by their corresponding *query functions*. 
+Queries are initialized by a call to a *query function* within the *SLDB Object*. Basic queries such as select, insert, delete, and update can be called by their corresponding *query functions*.
 
 Query Types
 -----------

@@ -1,3 +1,5 @@
+.. _query-examples:
+
 Query Examples
 ==============
 
@@ -94,12 +96,12 @@ Updating Data
     	'database_pass'  =>  'secret',
     ));
 
-    //UPDATE orders WHERE order_id=127 SET first_name='jane' WHERE first_name LIKE 'john' AND last_name='doe' OR last_name='smith' LIMIT NONE;
+    //UPDATE orders WHERE order_id=127 SET first_name='jane' WHERE first_name LIKE 'john' AND last_name LIKE 'doe' OR last_name NOT 'smith' LIMIT NONE;
     $result = $database->update(
        'orders',
    		array(
-    		'first_name' => 'john[l]',
-    		'last_name' => ['doe','smith'],
+    		'first_name' => '[l]john',
+    		'last_name' => array([l]doe','||','[!]smith'),
     	),
     	array(
     		'first_name' => 'jane',
@@ -133,7 +135,7 @@ Deleting Data
        'orders',
    		array(
     		'first_name' => 'jane',
-    		'last_name' => 'doe[l]',
+    		'last_name' => '[l]doe',
     	),
     	25);
 
