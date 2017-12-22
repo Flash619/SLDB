@@ -1,15 +1,18 @@
  <?php
 
  use PHPUnit\Framework\TestCase;
+ use SLDB\MySQL\Database as MySQLDatabase;
  use SLDB\MySQL\Query as MySQLQuery;
 
  class MySQLQueryTest extends TestCase{
 
  	public function testInitializeObject(){
 
- 		$query = new MySQLQuery();
+ 		$db = new MySQLDatabase();
+ 		$query = $db->initQuery(QueryType::SELECT);
 
  		$this->AssertFalse((!$query instanceof MySQLQuery),"Failed to initialize MySQL Database object.");
+ 		$this->AssertEquals(QueryType::SELECT,$query->getType());
 
  	}
 
@@ -19,19 +22,8 @@
 
  		$a = "SELECT id,name,quantity FROM test_table WHERE color != ? AND size > ? LIMIT ? OFFSET ?";
 
- 		$b = $query->generateSelectQuery(
- 			"test_table",
- 			array(
- 				"id",
- 				"name",
- 				"quantity",
- 			),
- 			array(
- 				"color" => "[!=]blue",
- 				"size" => "[>]20",
- 			),
- 			25,
- 			10
+ 		$b = 
+
  		);
 
  		$this->AssertEquals($a,$b['syntax'],"Generated query syntax did not match expected query syntax.");
