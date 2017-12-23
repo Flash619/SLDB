@@ -5,8 +5,13 @@ namespace SLDB\Base;
 use SLDB\Base\Database as BaseDatabase;
 use SLDB\Operator;
 
+/**
+* This is the base query object, used and inherited by all other query objects. This object is designed to store parameters for queries and generate syntax and parameter arrays accordignly for its respective database type. This object is then passed to a Database::execute() function for execution of its internal syntax.
+*@author Travis Truttschel
+*/
 class Query{
 
+	// Constants used for query type identification.
 	const SELECT  = 1;
 	const UPDATE  = 2;
 	const INSERT  = 3;
@@ -14,22 +19,74 @@ class Query{
 	const CREATE  = 5;
 	const DROP    = 6;
 
+	/**
+	* The type of database this query is designed for.
+	*/
 	protected $_database_type;
+
+	/**
+	* The table name this database should target during execution.
+	*/
 	protected $_table;
+
+	/**
+	* The type of query that this query is.
+	*/
 	protected $_type;
 
+	/**
+	* The fields this query should select or refer to during execution.
+	*/
 	protected $_fields;
+
+	/**
+	* The values this query should assign to fields during execution.
+	*/
 	protected $_values;
+
+	/**
+	* The operator this query should use during execution.
+	*/
 	protected $_operator;
+
+	/**
+	* The ammount of rows this query should be limited to during execution.
+	*/
 	protected $_limit;
+
+	/**
+	* The ammount of rows this query should be offset by during execution.
+	*/
 	protected $_offset;
 
+	/**
+	* The syntax this query should use during execution, generated via the Query::generate() function.
+	*/
 	protected $_syntax;
+
+	/**
+	* The array of params this query should use during execution in reference to the syntax this query has generated.
+	*/
 	protected $_params;
 
+	/**
+	* The rows returned from a select query during execution.
+	*/
 	protected $_rows_returned;
+
+	/**
+	* The number of rows this query has affected during execution.
+	*/
 	protected $_rows_affected;
+
+	/**
+	* The message collected from the database during execution.
+	*/
 	protected $_message;
+
+	/**
+	* The error collected from the database during execution.
+	*/
 	protected $_error;
 
 	/**
@@ -68,6 +125,11 @@ class Query{
 	*/
 	function __destruct(){}
 
+	/**
+	* Sets the selected fields for this query to the field names in the provided array.
+	* @param array $fields An array of field names to reference or retrieve.
+	* @return SLDB\Base\Query This query.
+	*/
 	function setFields(array $fields){
 
 		$this->_fields = $fields;
@@ -75,7 +137,11 @@ class Query{
 		
 	}
 
-
+	/**
+	* Adds a field name provided to the list of field names to be referenced or retrieved in this query.
+	* @param string $fields Field name to reference or retrieve.
+	* @return SLDB\Base\Query This query.
+	*/
 	function addField(string $field){
 
 		$this->_fields[] = $field;
@@ -83,6 +149,12 @@ class Query{
 		
 	}
 
+	/**
+	* Adds a value provided to the list of values to be assigned in this query.
+	* @param string $field The field this value should be assigned to.
+	* @param string $value The value that should be assigned to this field.
+	* @return SLDB\Base\Query This query.
+	*/
 	function addValue(string $field, string $value){
 
 		$this->_values[$field] = $value;
@@ -90,6 +162,11 @@ class Query{
 
 	}
 
+	/**
+	* Adds as an array of values to the list of values to be assigned in this query.
+	* @param array $values An array of field names and values to add to the list of values to be assigned.
+	* @return SLDB\Base\Query This query.
+	*/
 	function addValues(array $values){
 
 		$this->_values = array_merge($this->_values, $values);
@@ -97,6 +174,11 @@ class Query{
 
 	}
 
+	/**
+	* Sets the values to be assigned in this query to the provided array of field names and values.
+	* @param array $values An array of field names and values to be assigned in this query.
+	* @return SLDB\Base\Query This query.
+	*/
 	function setValues(array $values){
 
 		$this->_values = $values;
@@ -104,6 +186,11 @@ class Query{
 
 	}
 
+	/**
+	* Sets the operator in this query to the operator provided.
+	* @param SLDB\Operator $operator The operator to use in this query.
+	* @return SLDB\Base\Query This query.
+	*/
 	function setOperator(Operator $operator){
 
 		$this->_operator = $operator;
@@ -111,6 +198,12 @@ class Query{
 
 	}
 
+	/**
+	* Sets the limit of rows this query should affect. This value is only honored if the database and query
+	* type supports limits.
+	* @param int $limit The number of rows this query should affect.
+	* @return SLDB\Base\Query This query.
+	*/
 	function setLimit(int $limit){
 
 		$this->_limit = $limit;
@@ -118,6 +211,11 @@ class Query{
 
 	}
 
+	/**
+	* Sets the ammount of rows that this query should be offset by. This value is only honored if the database and query type supports offsets. 
+	* @param int $offset The ammount of rows this query should be offset by.
+	* @return SLDB\Base\Query This query.
+	*/
 	function setOffset(int $offset){
 
 		$this->_offset = $offset;
@@ -125,6 +223,11 @@ class Query{
 
 	}
 
+	/**
+	* Sets what type of query this is. This value is one of SELECT, INSERT, UPDATE, DELETE, CREATE, DROP constants stored within the SLDB\Base\Query object.
+	* @param int $type The SLDB\Base\Query constant that referrs to this queries type.
+	* @return SLDB\Base\Query This query.
+	*/
 	function setType(int $type){
 
 		$this->_type = $type;
@@ -132,6 +235,11 @@ class Query{
 
 	}
 
+	/**
+	* Sets the table or collection this query should target.
+	* @param string The name of the table or collection this query should target.
+	* @return SLDB\Base\Query This query.
+	*/
 	function setTable(string $table){
 
 		$this->_table = $table;
@@ -139,72 +247,120 @@ class Query{
 
 	}
 
+	/**
+	* Returns the array of rows returned from this query. This is only useful for select queries.
+	* @return array Array of returned rows from this query.
+	*/
 	function getRowsReturned(){
 
 		return $this->_rows_returned;
 
 	}
 
+	/**
+	* Returns the number of rows affected by this query. 
+	* @return int Number of rows affected by this query.
+	*/
 	function getRowsAffected(){
 
 		return $this->_rows_affected;
 
 	}
 
+	/**
+	* Returns the error stored within this query if an error was encounted during execution.
+	* @return string or NULL Error stored within this query if one exists.
+	*/
 	function getError(){
 
 		return $this->_error;
 
 	}
 
+	/**
+	* Returns the database output message collected during execution if one was stored. 
+	* @return string or NULL Database message during execution if one exists. 
+	*/
 	function getMessage(){
 
 		return $this->_message;
 
 	}
 
+	/**
+	* Returns the type of query this query is. This value is compared using the defined type constants within SLDB\Base\Query.
+	* @return int Type of query.
+	*/
 	function getType(){
 
 		return $this->_type;
 
 	}
 
+	/**
+	* Returns the database type that this query is designed to be compatible with. This value is compared using the defined constants within SLDB\Base\Database.
+	* @return int Type of database this query is designed for.
+	*/
 	function getDatabaseType(){
 
 		return $this->_database_type;
 
 	}
 
+	/**
+	* Returns the table or collection name this query is set to target. 
+	* @return string Table or collection name.
+	*/
 	function getTable(){
 
 		return $this->_table;
 
 	}
 
+	/**
+	* Returns the syntax generated by this query after using the Query::generate() function. 
+	* @return string Syntax generated.
+	*/
 	function getSyntax(){
 
 		return $this->_syntax;
 
 	}
 
+	/**
+	* Returns an array of parameters to be bound during execution in reference to the query syntax generated by this query.
+	* @return array Params to be bound during execution.
+	*/
 	function getParams(){
 
 		return $this->_params;
 
 	}
 
+	/**
+	* Returns the array of field names and values stored within this query to be assigned during execution.
+	* @return array Field names and values to be assigned during execution of this query.
+	*/
 	function getValues(){
 
 		return $this->_values;
 
 	}
 
+	/**
+	* Returns the operator to be used during execution of this query.
+	* @return SLDB\Operator Operator to be used during execution of this query.
+	*/
 	function getOperator(){
 
 		return $this->_operator;
 
 	}
 
+	/**
+	* Returns true if this query has a error stored from during execution. Otherwise false is returned. 
+	* @return boolean True if an error is stored within this query, otherwise false.
+	*/
 	function hasError(){
 
 		if( $this->_error !== NULL ){
@@ -217,6 +373,10 @@ class Query{
 
 	}
 
+	/**
+	* Returns true if this query has a message stored from during execution. Otherwise false is returned. 
+	* @return boolean True if an message is stored within this query, otherwise false.
+	*/
 	function hasMessage(){
 
 		if( $this->_message !== NULL ){
@@ -228,6 +388,9 @@ class Query{
 		return false;
 	}
 
+	/**
+	* Generates the syntax for this query based on all parameters stored within this query. This function will also popluate the internal params array to be used during execution in reference to the syntax string stored within this query.
+	*/
     function generate(){
 
 		switch($this->_type){

@@ -84,10 +84,6 @@ class SLDB{
 	*/
 	private function setConfig(array $config){
 
-		// --------------------------------------------------
-		// Verify profided configuration validity
-		// --------------------------------------------------
-
 		$matchedParams = array();
 
 		//Loop through all $config as $k (key) $v (value)

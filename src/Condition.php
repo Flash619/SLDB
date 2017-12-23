@@ -2,8 +2,13 @@
 
 namespace SLDB;
 
+/**
+* This class is designed to work with the SLDB\Operator class. Conditions are stored within operators, and conditions tell SLDB what rows queries should apply to based on field value comparisons. These conditions are then generated into query syntax within SLDB\Base\Query objects and used during execution.
+*@author Travis Truttschel
+*/
 class Condition{
 
+	// Constants used for condition type identification.
 	const LIKE                = 1;
 	const NOT_LIKE            = 2;
 	const EQUAL_TO            = 3;
@@ -13,8 +18,19 @@ class Condition{
 	const GREATER_OR_EQUAL_TO = 7;
 	const LESS_OR_EQUAL_TO    = 8;
 
+	/**
+	* The field this condition should apply to.
+	*/
 	private $_field;
+
+	/**
+	* The type of condition that should apply to this condition.
+	*/
 	private $_type;
+
+	/**
+	* The value this condition should use as reference when making comparisons.
+	*/
 	private $_value;
 
 	/**
@@ -33,24 +49,41 @@ class Condition{
 	*/
 	function __destruct(){}
 
+	/**
+	* Returns the field name this condition should apply to.
+	* @return string The field name this condition should apply to.
+	*/
 	function getField(){
 
 		return $this->_field;
 
 	}
 
+	/**
+	* Returns the type of condition that should apply to this condition.
+	* @return int The type of condition that should apply to this condition.
+	*/
 	function getType(){
 
 		return $this->_type;
 
 	}
 
+	/**
+	* Returns the value this condition should use as reference when making comparisons.
+	* @return string The value that this condition should use as reference when making comparisons.
+	*/
 	function getValue(){
 
 		return $this->_value;
 
 	}
 
+	/**
+	* Sets the field name this condition should apply to.
+	* @param string $field The field name this condition should apply to.
+	* @return SLDB\Condition This condition.
+	*/
 	function setField(string $field=NULL){
 
 		$this->_field = $field;
@@ -58,6 +91,11 @@ class Condition{
 
 	}
 
+	/**
+	* Sets the type of condition that should apply to this condition.
+	* @param int $type The type of condition that should apply to this condition.
+	* @return SLDB\Condition This condition.
+	*/
 	function setType(int $type=NULL){
 
 		$this->_type = $type;
@@ -65,6 +103,11 @@ class Condition{
 
 	}
 
+	/**
+	* Sets the value this condition should use as reference when making comparisons.
+	* @param string $value The value this condition should use when making comparisons.
+	* @return SLDB\Condition This condition.
+	*/
 	function setValue(string $value=NULL){
 
 		$this->_value = $value;
@@ -73,19 +116,3 @@ class Condition{
 	}
 
 }
-
-/*
-$myshit = SLDB->select('mytable',new array('id','somefield'),new Condition('id',ConditionType::LIKE,'butts'));
-
-$query = new SelectQuery('mytable');
-
-$query->addField('id');
-$query->addField('somefield');
-$query->addFields(array('anotherfield','price');
-
-$query->addCondition(new Condition('id',ConditionType::LIKE,'butts'))
-
-$query->execute();
-
-$MyValueArray = $query->fetchValues();
-*/

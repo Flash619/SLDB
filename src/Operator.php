@@ -4,13 +4,25 @@ namespace SLDB;
 
 use SLDB\Condition;
 
+/**
+* The operator class is used by queries to determine which rows a query should apply to based on field value comparison within stored conditions. Each condition stored within this operator holds a field, value, and condition type. When all conditions match a particular row, that row is affected or selected by the active query. Operators can store a limitless number of conditions. Conditions can also be nested oeprators as well.
+* When the query is generated, all operators and conditions are parsed into syntax and parameter arrays for the database to use during the query execution. Translation of operators to syntax takes place within the SLDB Query objects of their respective database types.
+* @author Travis Truttschel
+*/
 class Operator{
 
+	// Constants used for operator type identification.
 	const AND_OPERATOR = 1;
 	const OR_OPERATOR  = 2;
 
+	/**
+	* The type of operator that this operator is.
+	*/
 	private $_type;
 
+	/**
+	* Conditions stored within this operator.
+	*/
 	private $_conditions;
 
 	/**
@@ -49,6 +61,12 @@ class Operator{
 	*/
 	function __destruct(){}
 
+	/**
+	* Adds a condition to this operator.
+	* @param SLDB\Condition SLDB\Operator $condition Condition or operator to add as a condition to this operator.
+	* @return SLDB\Operator This operator.
+	* @throws SLDB\InvalidOperatorArgumentsException If the suplied condition is not valid.
+	*/
 	function addCondition($condition){
 
 		if( $this->_validateConditions( array( $condition ) ) ){
@@ -61,6 +79,12 @@ class Operator{
 
 	}
 
+	/**
+	* Adds a array of conditions to the stored conditions within this operator.
+	* @param array $conditions Conditions to add to this operator.
+	* @return SLDB\Operator This operator.
+	* @throws SLDB\InvalidOperatorArgumentsException If the supplied conditions are not valid.
+	*/
 	function addConditions(array $conditions){
 
 		if( $this->_validateConditions( $conditions ) ){
@@ -73,6 +97,12 @@ class Operator{
 
 	}
 
+	/**
+	* Sets the conditions within this operator the the array of supplied conditions.
+	* @param array $conditions Conditions to use within this operator.
+	* @return SLDB\Operator This operator.
+	* @throws SLDB\InvalidOperatorArgumentsException If the supplied conditions are not valid.
+	*/
 	function setConditions(array $conditions){
 
 		if( $this->_validateConditions( $conditions ) ){
@@ -85,19 +115,32 @@ class Operator{
 
 	}
 
+	/**
+	* Returns the array of conditions stored within this operator.
+	* @return array Conditions within this operator.
+	*/
 	function getConditions(){
 
 		return $this->_conditions;
 
 	}
 
+	/**
+	* Returns the type of operator this operator is.
+	* @return int Operator type.
+	*/
 	function getType(){
 
 		return $this->_type;
 
 	}
 
-	private function _validateConditions($conditions){
+	/**
+	* Validates conditions supplied, including nested operators/conditions recursively.
+	* @param array $conditions Conditions to verify.
+	* @throws SLDB\InvalidOperatorArgumentsException If the supplied conditions are not valid.
+	*/
+	private function _validateConditions(array $conditions){
 
 		foreach( $conditions as $v ){
 
@@ -105,13 +148,13 @@ class Operator{
 
 				if(! is_a( $v, 'SLDB\Operator' ) ){
 
-					return false;
+					throw new InvalidOperatorArgumentsException();
 
 				}
 
 				if(! $this->_validateConditions( $v ) ){
 
-					return false;
+					throw new InvalidOperatorArgumentsException();
 
 				}
 
