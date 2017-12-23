@@ -1,8 +1,9 @@
 <?php
 
-namespace SLDB\MySQL
+namespace SLDB\MySQL;
 
 use SLDB\Base\Database as BaseDatabase;
+use SLDB\Base\Query    as BaseQuery;
 use SLDB\MySQL\Query   as MySQLQuery;
 
 class Database extends BaseDatabase{
@@ -27,11 +28,15 @@ class Database extends BaseDatabase{
 
 	function initQuery(int $type=NULL){
 
-		return new MySQLQuery($this,$type);
+		return new MySQLQuery($type);
 
 	}
 
-	function execute(&MySQLQuery $query){
+	function execute(BaseQuery &$query){
+
+		if( ! is_a( $query, MySQLQuery ) ){
+			throw new \Exception("Query supplied does not match database type.");
+		}
 
 		$query->generate();
 

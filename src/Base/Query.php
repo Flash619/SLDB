@@ -3,11 +3,16 @@
 namespace SLDB\Base;
 
 use SLDB\Base\Database as BaseDatabase;
-use SLDB\DatabaseTYpe;
 use SLDB\Operator;
-use SLDB\QueryType;
 
 class Query{
+
+	const SELECT  = 1;
+	const UPDATE  = 2;
+	const INSERT  = 3;
+	const DELETE  = 4;
+	const CREATE  = 5;
+	const DROP    = 6;
 
 	protected $_database_type;
 	protected $_table;
@@ -30,7 +35,7 @@ class Query{
 	/**
 	* Class Constructor
 	*/
-	function __construct(,int $type=NULL){
+	function __construct(int $type=NULL){
 
 		if($type !== NULL){
 
@@ -72,7 +77,7 @@ class Query{
 
 	function setOperator(Operator $operator){
 
-		$this->_operator[] = $operator;
+		$this->_operator = $operator;
 
 	}
 
@@ -186,22 +191,22 @@ class Query{
     function generate(){
 
 		switch($this->_type){
-			QueryType::SELECT:
+			case self::SELECT:
 				$this->generateSelectSyntax();
 				break;
-			QueryType::UPDATE:
+			case self::UPDATE:
 				$this->generateUpdateSyntax();
 				break;
-			QueryType::INSERT:
+			case self::INSERT:
 				$this->generateInsertSyntax();
 				break;
-			QueryType::DELETE:
+			case self::DELETE:
 				$this->generateDeleteSyntax();
 				break;
-			QueryType::CREATE:
+			case self::CREATE:
 				$this->generateCreateSyntax();
 				break;
-			QueryType::DROP:
+			case self::DROP:
 				$this->generateDropSyntax();
 				break;
 			default:

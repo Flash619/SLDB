@@ -14,7 +14,6 @@ namespace SLDB;
 use SLDB\Base\Query as BaseQuery;
 use SLDB\Base\Database as BaseDatabase;
 use SLDB\MySQL\Database as MySQLDatabase;
-use SLDB\DatabaseTYpe;
 
 class SLDB{
 
@@ -122,7 +121,7 @@ class SLDB{
 		switch( strtolower( $config['database_type'] ) ){
 			case 'mysql':
 				$this->_database = new MySQLDatabase($this->_config);
-				$config['database_type'] = DatabaseType::MYSQL;
+				$config['database_type'] = MySQLDatabase::MYSQL;
 				break;
 			default:
 				throw new InvalidConfigurationException("Database type not supported.");

@@ -1,11 +1,13 @@
 <?php
 
-namespace SLDB
+namespace SLDB;
 
 use SLDB\Condition;
-use SLDB\OperatorType;
 
 class Operator{
+
+	const AND_OPERATOR = 1;
+	const OR_OPERATOR  = 2;
 
 	private $_type;
 
@@ -49,7 +51,7 @@ class Operator{
 
 	function addCondition($condition){
 
-		if( $this->_validateConditions( new array( $condition ) ) ){
+		if( $this->_validateConditions( array( $condition ) ) ){
 
 			$this->_conditions[] = $condition;
 
@@ -73,13 +75,19 @@ class Operator{
 
 	}
 
+	function getType(){
+
+		return $this->_type;
+
+	}
+
 	private function _validateConditions($conditions){
 
 		foreach( $conditions as $v ){
 
-			if(! is_a( $v, Condition ) ){
+			if(! is_a( $v, 'SLDB\Condition' ) ){
 
-				if(! is_a( $v, Operator ) ){
+				if(! is_a( $v, 'SLDB\Operator' ) ){
 
 					return false;
 

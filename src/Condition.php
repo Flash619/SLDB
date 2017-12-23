@@ -2,21 +2,28 @@
 
 namespace SLDB;
 
-use SLDB\ConditionType;
-
 class Condition{
 
+	const LIKE                = 1;
+	const NOT_LIKE            = 2;
+	const EQUAL_TO            = 3;
+	const NOT_EQUAL_TO        = 4;
+	consT GREATER_THAN        = 5;
+	const LESS_THAN           = 6;
+	const GREATER_OR_EQUAL_TO = 7;
+	const LESS_OR_EQUAL_TO    = 8;
+
 	private $_field;
-	private $_condition;
+	private $_type;
 	private $_value;
 
 	/**
 	* Class Constructor
 	*/
-	function __construct(string $field=NULL,int $condition=NULL,string $value=NULL){
+	function __construct(string $field=NULL,int $type=NULL,string $value=NULL){
 
 		$this->setField($field);
-		$this->setCondition($condition);
+		$this->setType($type);
 		$this->setValue($value);
 
 	}
@@ -30,8 +37,8 @@ class Condition{
 		return $this->_field;
 	}
 
-	function getCondition(){
-		return $this->_condition;
+	function getType(){
+		return $this->_type;
 	}
 
 	function getValue(){
@@ -42,8 +49,8 @@ class Condition{
 		$this->_field = $field;
 	}
 
-	function setCondition(int $condition=NULL){
-		$this->_condition = $condition;
+	function setType(int $type=NULL){
+		$this->_type = $type;
 	}
 
 	function setValue(string $value=NULL){

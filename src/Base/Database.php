@@ -3,9 +3,12 @@
 namespace SLDB\Base;
 
 use SLDB\Base\Query as BaseQuery;
-use SLDB\DatabaseType;
 
 class Database{
+
+	const MYSQL      = 1;
+	const POSTGRESQL = 2;
+	const MONGODB    = 3;
 
 	protected $_type;
 	protected $_config;
@@ -56,6 +59,6 @@ class Database{
 	}
 
 
-	function execute(&BaseQuery $query){}
+	function execute(BaseQuery &$query){}
 
 }

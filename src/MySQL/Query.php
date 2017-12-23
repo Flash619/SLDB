@@ -1,10 +1,11 @@
 <?php
 
-namespace SLDB\MySQL
+namespace SLDB\MySQL;
 
-use SLDB\Base\Query as BaseQuery;
+use SLDB\Base\Query    as BaseQuery;
 use SLDB\Base\Database as BaseDatabase;
-use SLDB\DatabaseType;
+use SLDB\Operator;
+use SLDB\Condition;
 
 class Query extends BaseQuery{
 
@@ -15,7 +16,7 @@ class Query extends BaseQuery{
 
 		BaseQuery::__construct($type);
 
-		$this->_database_type = DatabaseType:MYSQL;
+		$this->_database_type = BaseDatabase::MYSQL;
 
 	}
 
@@ -31,10 +32,11 @@ class Query extends BaseQuery{
 	protected function operatorToSyntax(Operator $operator){
 
 		$result = array('syntax'=>'','params'=>array());
+		$s = '';
 
 		foreach( $operator->getConditions() as $v ){
 
-			if( is_a( $v, Operator ) ){
+			if( is_a( $v, 'SLDB\Operator' ) ){
 
 				$subresult = $this->operatorToSyntax( $v );
 				$s = $s.' ('.$subresult['syntax'].') ';
@@ -47,28 +49,28 @@ class Query extends BaseQuery{
 			$ss = $v->getField();
 
 			switch( $v->getType() ){
-				case ConditionType::LIKE:
+				case Condition::LIKE:
 					$ss = $ss.' LIKE ';
 					break;
-				case ConditionType::NOT_LIKE:
+				case Condition::NOT_LIKE:
 					$ss = $ss.' NOT LIKE ';
 					break;
-				case ConditionType::EQUAL_TO:
+				case Condition::EQUAL_TO:
 					$ss = $ss.' = ';
 					break;
-				case ConditionType::NOT_EQUAL_TO:
+				case Condition::NOT_EQUAL_TO:
 					$ss = $ss.' != ';
 					break;
-				case ConditionType::GREATER_THAN:
+				case Condition::GREATER_THAN:
 					$ss = $ss.' > ';
 					break;
-				case ConditionType::LESS_THAN:
+				case Condition::LESS_THAN:
 					$ss = $ss.' < ';
 					break;
-				case ConditionType::GREATER_OR_EQUAL_TO:
+				case Condition::GREATER_OR_EQUAL_TO:
 					$ss = $ss.' >= ';
 					break;
-				case ConditionType::LESS_OR_EQUAL_TO:
+				case Condition::LESS_OR_EQUAL_TO:
 					$ss = $ss.' <= ';
 					break;
 			}
@@ -76,25 +78,25 @@ class Query extends BaseQuery{
 			$ss = $ss.'?';
 
 			switch( $operator->getType() ){
-				case OperatorType::_AND_:
+				case Operator::AND_OPERATOR:
 					$ss = $ss.' AND ';
 					break;
-				case OperatorType::_OR_:
+				case Operator::OR_OPERATOR:
 					$ss = $ss.' OR ';
 					break;
 			}
 
-			$s  = $s.$ss;
+			$s = $s.$ss;
 
 			$result['params'][] = $v->getValue();
 
 		}
 
 		switch( $operator->getType() ){
-			case OperatorType::_AND_:
+			case Operator::AND_OPERATOR:
 				$s = rtrim($s,' AND ');
 				break;
-			case OperatorType::_OR_:
+			case Operator::OR_OPERATOR:
 				$s = rtrim($s,' OR ');
 				break;
 		}
@@ -131,13 +133,13 @@ class Query extends BaseQuery{
 
 		if( $this->_limit !== NULL ){
 
-			$s = $s.'LIMIT '.$this->_limit;
+			$s = $s.' LIMIT '.$this->_limit;
 
 		}
 
 		if( $this->_offset !== NULL ){
 
-			$s = $s.'OFFSET '.$this->_offset;
+			$s = $s.' OFFSET '.$this->_offset;
 
 		}
 
