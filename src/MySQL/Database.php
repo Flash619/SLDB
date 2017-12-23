@@ -31,7 +31,7 @@ class Database extends BaseDatabase{
 
 	}
 
-	function execute(MySQLQuery $query){
+	function execute(&MySQLQuery $query){
 
 		$query->generate();
 

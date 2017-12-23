@@ -3,20 +3,12 @@
 namespace SLDB\Base;
 
 use SLDB\Base\Database as BaseDatabase;
+use SLDB\DatabaseTYpe;
 use SLDB\Operator;
-
-class QueryType{
-	const SELECT  = 1;
-	const UPDATE  = 2;
-	const INSERT  = 3;
-	const DELETE  = 4;
-	const CREATE  = 5;
-	const DROP    = 6;
-}
+use SLDB\QueryType;
 
 class Query{
 
-	protected $_database;
 	protected $_database_type;
 	protected $_table;
 	protected $_type;
@@ -38,12 +30,7 @@ class Query{
 	/**
 	* Class Constructor
 	*/
-	function __construct(BaseDatabase $database=NULL,int $type=NULL){
-
-		if($database !== NULL){
-
-			$this->setDatabase($database);
-		}
+	function __construct(,int $type=NULL){
 
 		if($type !== NULL){
 
@@ -58,9 +45,9 @@ class Query{
 	*/
 	function __destruct(){}
 
-	function addFields(array $fields){
+	function setFields(array $fields){
 
-		$this->_fields = array_merge($this->_fields,$fields);
+		$this->_fields = $fields;
 		
 	}
 
@@ -77,9 +64,9 @@ class Query{
 
 	}
 
-	function addValues(array $field_values){
+	function setValues(array $field_values){
 
-		$this->_field_values = array_merge($this->_field_values,$field_values);
+		$this->_field_values = $field_values;
 
 	}
 
@@ -104,12 +91,6 @@ class Query{
 	function setType(int $type){
 
 		$this->_type = $type;
-
-	}
-
-	function setDatabase(BaseDatabase $database){
-
-		$this->_database = $database;
 
 	}
 
@@ -152,12 +133,6 @@ class Query{
 	function getDatabaseType(){
 
 		return $this->_database_type;
-
-	}
-
-	function getDatabase(){
-
-		return $this->_database;
 
 	}
 

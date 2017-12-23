@@ -3,11 +3,7 @@
 namespace SLDB
 
 use SLDB\Condition;
-
-class OperatorType{
-	const _AND_ = 1;
-	const _OR_  = 2;
-}
+use SLDB\OperatorType;
 
 class Operator{
 

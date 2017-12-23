@@ -14,6 +14,7 @@ namespace SLDB;
 use SLDB\Base\Query as BaseQuery;
 use SLDB\Base\Database as BaseDatabase;
 use SLDB\MySQL\Database as MySQLDatabase;
+use SLDB\DatabaseTYpe;
 
 class SLDB{
 
@@ -145,7 +146,7 @@ class SLDB{
 		$query = $this->_database->initQuery(QueryType::SELECT);
 
 		$query->setTable($table);
-		$query->addFields($fields);
+		$query->setFields($fields);
 		$query->setOperator($operator);
 		$query->setLimit($limit);
 		$query->setOffset($offset);
@@ -158,17 +159,16 @@ class SLDB{
 
 	}
 
-	function update(string $table=NULL,array $values=NULL,array $operator=NULL,int $limit=NULL,int $offset=NULL){
+	function update(string $table=NULL,array $values=NULL,array $operator=NULL,int $limit=NULL){
 
 		if( $table === NULL || $values === NULL || $conditions === NULL ){return NULL;}
 
 		$query = $this->_database->initQuery(QueryType::UPDATE);
 
 		$query->setTable($table);
-		$query->addValues($values);
+		$query->setValues($values);
 		$query->setOperator($operator);
 		$query->setLimit($limit);
-		$query->setOffset($offset);
 
 		$query->generate();
 
@@ -185,7 +185,7 @@ class SLDB{
 		$query = $this->_database->initQuery(QueryType::INSERT);
 
 		$query->setTable($table);
-		$query->addValues($values);
+		$query->setValues($values);
 
 		$query->generate();
 
@@ -195,7 +195,7 @@ class SLDB{
 
 	}
 
-	function delete(string $table=NULL,array $operator=NULL,int $limit=NULL,int $offset=NULL){
+	function delete(string $table=NULL,array $operator=NULL,int $limit=NULL){
 
 		if( $table === NULL || $conditions === NULL ){return NULL;}
 
@@ -204,7 +204,6 @@ class SLDB{
 		$query->setTable($table);
 		$query->setOperator($operator);
 		$query->setLimit($limit);
-		$query->setOffset($offset);
 
 		$query->generate();
 

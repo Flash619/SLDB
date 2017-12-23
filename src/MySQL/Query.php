@@ -4,16 +4,16 @@ namespace SLDB\MySQL
 
 use SLDB\Base\Query as BaseQuery;
 use SLDB\Base\Database as BaseDatabase;
-use SLDB\MySQL\Database as MySQLDatabase;
+use SLDB\DatabaseType;
 
 class Query extends BaseQuery{
 
 	/**
 	* Class Constructor
 	*/
-	function __construct(MySQLDatabase $database=NULL,int $type=NULL){
+	function __construct(int $type=NULL){
 
-		BaseQuery::__construct($database,$type);
+		BaseQuery::__construct($type);
 
 		$this->_database_type = DatabaseType:MYSQL;
 

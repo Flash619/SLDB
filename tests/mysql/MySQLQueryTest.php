@@ -11,18 +11,31 @@
  		$db = new MySQLDatabase();
  		$query = $db->initQuery(QueryType::SELECT);
 
- 		$this->AssertFalse((!$query instanceof MySQLQuery),"Failed to initialize MySQL Database object.");
+ 		$this->AssertFalse((! is_a($query, MySQLQuery),"Failed to initialize MySQL Database object.");
  		$this->AssertEquals(QueryType::SELECT,$query->getType());
 
  	}
 
  	public function testMySQLSelectQuery(){
 
- 		$query = new MySQLQuery();
+ 		$query = new MySQLQuery(QueryType::SELECT);
+ 		$query->setTable('test_table');
+ 		$query->setFields(array('id','name','quantity'));
+ 		$query->setOperator(new Operator(
+ 			array(
+ 				new Condition('color',ConditionType::NOT_EQUAL_TO,'blue'),
+ 				new Condition('size',ConditionType::GREATER_THAN,'20'),
+ 			)
+ 		));
+ 		$query->setLimit(15);
+ 		$query->setOffset(15);
+
+ 		$query->generate();
 
  		$a = "SELECT id,name,quantity FROM test_table WHERE color != ? AND size > ? LIMIT ? OFFSET ?";
 
- 		$b = 
+ 		$b = $query->getSyntax();
+ 		$p = $query->getParams();
 
  		$this->AssertEquals($a,$b['syntax'],"Generated query syntax did not match expected query syntax.");
  		$this->AssertEquals(4,count($b['params']),"Param count did not equal expected return count.");
