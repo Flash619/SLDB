@@ -9,8 +9,11 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
+        <testsuite name="SLDB">
+            <file>tests/SLDBTest.php</file>
+        </testsuite>
         <testsuite name="MySQL">
-            <directory suffix=".php">tests/mysql</directory>
+            <directory suffix=".php">tests/MySQL</directory>
         </testsuite>
     </testsuites>
     <filter>

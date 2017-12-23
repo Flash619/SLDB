@@ -1,39 +1,35 @@
- <?php
+<?php
 
- use PHPUnit\Framework\TestCase;
- use SLDB\MySQL\Database as Database;
- use SLDB\MySQL\Query as Query;
- use SLDB\Condition;
- use SLDB\Operator;
+use PHPUnit\Framework\TestCase;
+use SLDB\MySQL\Database as Database;
+use SLDB\MySQL\Query as Query;
+use SLDB\Condition;
+use SLDB\Operator;
 
- class MySQLQueryTest extends TestCase{
+class MySQLQueryTest extends TestCase{
 
- 	public function testInitializeObject(){
+ 	function testInitializeObject(){
 
  		$db = new Database();
  		$query = $db->initQuery(Query::SELECT);
 
  		$this->AssertFalse((! is_a($query, 'SLDB\MySQL\Query')),"Failed to initialize MySQL Database object.");
- 		$this->AssertEquals(Query::SELECT,$query->getType());
+ 		$this->AssertEquals(Query::SELECT,$query->getType(),"Database queryInit() returned invalid object.");
+ 		$this->AssertEquals(Database::MYSQL,$query->getDatabaseType(),"Database queryInit() returned Query with invalid database type.");
 
  	}
 
- 	public function testMySQLSelectQuery(){
+ 	function testMySQLSelectQuery(){
 
  		$query = new Query(Query::SELECT);
- 		$query->setTable('test_table');
- 		$query->setFields(array('id','name','quantity'));
- 		$query->setOperator(new Operator(
+
+ 		$query->setTable('test_table')->setFields(array('id','name','quantity'))->setOperator(new Operator(
  			Operator::AND_OPERATOR,
  			array(
  				new Condition('color',Condition::NOT_EQUAL_TO,'blue'),
  				new Condition('size',Condition::GREATER_THAN,'20'),
  			)
- 		));
- 		$query->setLimit(15);
- 		$query->setOffset(15);
-
- 		$query->generate();
+ 		))->setLimit(15)->setOffset(15)->generate();
 
  		$a = "SELECT id,name,quantity FROM test_table WHERE color != ? AND size > ? LIMIT 15 OFFSET 15";
 
@@ -46,70 +42,76 @@
  		$this->AssertEquals("20",$p[1],"Expected param did not match actual param returned.");
 
  	}
-/*
- 	public function testMySQLInsertQuery(){
 
- 		$query = new MySQLQuery();
+ 	function testMySQLInsertQuery(){
+
+ 		$query = new Query(Query::INSERT);
+
+ 		$query->setTable('test_table')->setValues(array(
+ 			'name'     => 'red and delicious',
+ 			'quantity' => 25,
+ 			'color'    => 'red',
+ 			'size'     => 'small',
+ 		))->generate();
 
  		$a = "INSERT INTO test_table (name,quantity,color,size) VALUES (?,?,?,?)";
 
- 		$b = $query->generateInsertQuery(
- 			"test_table",
+ 		$b = $query->getSyntax();
+ 		$p = $query->getParams();
+
+ 		$this->AssertEquals($a,$b,"Generated query syntax did not match expected query syntax.");
+ 		$this->AssertEquals(4,count($p),"Param count did not equal expected return count.");
+ 		$this->AssertEquals('red and delicious',$p[0],"Expected param did not match actual param returned.");
+
+ 	}
+
+ 	function testMySQLDeleteQuery(){
+
+ 		$query = new Query(Query::DELETE);
+
+ 		$query->setTable('test_table')->setOperator(new Operator(
+ 			Operator::AND_OPERATOR,
  			array(
- 				"name" => "red and delicious",
- 				"quantity" => 25,
- 				"color" => "red",
- 				"size" => "small",
+ 				new Condition('color',Condition::EQUAL_TO,'blue'),
+ 				new Condition('size',Condition::EQUAL_TO,'small'),
+ 				new Condition('quantity',Condition::LESS_THAN,20),
  			)
- 		);
+ 		))->setLimit(1)->generate();
 
- 		$this->AssertEquals($a,$b['syntax'],"Generated query syntax did not match expected query syntax.");
- 		$this->AssertEquals(4,count($b['params']),"Param count did not equal expected return count.");
+ 		$a = "DELETE FROM test_table WHERE color = ? AND size = ? AND quantity < ? LIMIT 1";
 
- 	}
+ 		$b = $query->getSyntax();
+ 		$p = $query->getParams();
 
- 	public function testMySQLDeleteQuery(){
-
- 		$query = new MySQLQuery();
-
- 		$a = "DELETE FROM test_table WHERE color = ? AND size = ? AND quantity < ? LIMIT ?";
-
- 		$b = $query->generateDeleteQuery(
- 			"test_table",
- 			array(
- 				"color" => "blue",
- 				"size" => "small",
- 				"quantity" => "[<]20",
- 			),
- 			1
- 		);
-
- 		$this->AssertEquals($a,$b['syntax'],"Generated query syntax did not match expected query syntax.");
- 		$this->AssertEquals(4,count($b['params']),"Param count did not equal expected return count.");
+ 		$this->AssertEquals($a,$b,"Generated query syntax did not match expected query syntax.");
+ 		$this->AssertEquals(3,count($p),"Param count did not equal expected return count.");
+ 		$this->AssertEquals('small',$p[1],"Expected param did not match actual param returned.");
 
  	}
 
- 	public function testMySQLUpdateQuery(){
+ 	function testMySQLUpdateQuery(){
 
- 		$query = new MySQLQuery();
+ 		$query = new Query(Query::UPDATE);
 
- 		$a = "UPDATE test_table SET color = ? AND quantity = ? WHERE id = ? LIMIT ?";
-
- 		$b = $query->generateUpdateQuery(
- 			"test_table",
+ 		$query->setTable('test_table')->addValues(array(
+ 			'color'    => 'red',
+ 			'quantity' => 20,
+ 		))->setOperator(new Operator(
+ 			Operator::AND_OPERATOR,
  			array(
- 				"id" => 10,
- 			),
- 			array(
- 				"color" => "red",
- 				"quantity" => "20",
- 			),
- 			1
- 		);
+ 				new Condition('id',Condition::EQUAL_TO,10),
+ 			)
+ 		))->setLimit(1)->generate();
 
- 		$this->AssertEquals($a,$b['syntax'],"Generated query syntax did not match expected query syntax.");
- 		$this->AssertEquals(4,count($b['params']),"Param count did not equal expected return count.");
+ 		$a = "UPDATE test_table SET color = ?,quantity = ? WHERE id = ? LIMIT 1";
+
+ 		$b = $query->getSyntax();
+ 		$p = $query->getParams();
+
+ 		$this->AssertEquals($a,$b,"Generated query syntax did not match expected query syntax.");
+ 		$this->AssertEquals(3,count($p),"Param count did not equal expected return count.");
+ 		$this->AssertEquals(10,$p[2],"Expected param did not match actual param returned.");
 
  	}
-*/
- }
+
+}

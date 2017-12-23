@@ -14,6 +14,7 @@ class Database extends BaseDatabase{
 	function __construct(array $config=NULL){
 
 		BaseDatabase::__construct($config);
+		$this->_type = self::MYSQL;
 
 	}
 

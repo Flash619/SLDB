@@ -19,7 +19,7 @@ class Query{
 	protected $_type;
 
 	protected $_fields;
-	protected $_field_values;
+	protected $_values;
 	protected $_operator;
 	protected $_limit;
 	protected $_offset;
@@ -37,6 +37,24 @@ class Query{
 	*/
 	function __construct(int $type=NULL){
 
+		$this->_database_type = '';
+		$this->_table         = '';
+		$this->_type          =  0;
+
+		$this->_fields        =  array();
+		$this->_values        =  array();
+		$this->_operator      =  NULL;
+		$this->_limit         =  NULL;
+		$this->_offest        =  NULL;
+
+		$this->_syntax        = '';
+		$this->_params        = array();
+
+		$this->_rows_returned =  0;
+		$this->_rows_affected =  0;
+		$this->_message       =  NULL;
+		$this->_error         =  NULL;
+
 		if($type !== NULL){
 
 			$this->setType($type);
@@ -53,6 +71,7 @@ class Query{
 	function setFields(array $fields){
 
 		$this->_fields = $fields;
+		return $this;
 		
 	}
 
@@ -60,48 +79,63 @@ class Query{
 	function addField(string $field){
 
 		$this->_fields[] = $field;
+		return $this;
 		
 	}
 
 	function addValue(string $field, string $value){
 
-		$this->_field_values[$field] = $value;
+		$this->_values[$field] = $value;
+		return $this;
 
 	}
 
-	function setValues(array $field_values){
+	function addValues(array $values){
 
-		$this->_field_values = $field_values;
+		$this->_values = array_merge($this->_values, $values);
+		return $this;
+
+	}
+
+	function setValues(array $values){
+
+		$this->_values = $values;
+		return $this;
 
 	}
 
 	function setOperator(Operator $operator){
 
 		$this->_operator = $operator;
+		return $this;
 
 	}
 
 	function setLimit(int $limit){
 
 		$this->_limit = $limit;
+		return $this;
 
 	}
 
 	function setOffset(int $offset){
 
 		$this->_offset = $offset;
+		return $this;
 
 	}
 
 	function setType(int $type){
 
 		$this->_type = $type;
+		return $this;
 
 	}
 
 	function setTable(string $table){
 
 		$this->_table = $table;
+		return $this;
 
 	}
 
@@ -156,6 +190,12 @@ class Query{
 	function getParams(){
 
 		return $this->_params;
+
+	}
+
+	function getValues(){
+
+		return $this->_values;
 
 	}
 
@@ -216,8 +256,6 @@ class Query{
 	}
 
 	protected function operatorToSyntax(Operator $operator){}
-
-	protected function valuesToSyntax(array $values){}
 
 	protected function generateSelectSyntax(){}
 

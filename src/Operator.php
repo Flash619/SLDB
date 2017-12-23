@@ -57,15 +57,31 @@ class Operator{
 
 		}
 
+		return $this;
+
 	}
 
-	function addConditions(array $conditions ){
+	function addConditions(array $conditions){
 
 		if( $this->_validateConditions( $conditions ) ){
 
 			array_merge( $this->_conditions, $conditions );
 
 		}
+
+		return $this;
+
+	}
+
+	function setConditions(array $conditions){
+
+		if( $this->_validateConditions( $conditions ) ){
+
+			$this->_conditions = $conditions;
+
+		}
+
+		return $this;
 
 	}
 

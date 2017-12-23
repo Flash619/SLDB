@@ -55,6 +55,7 @@ class Database{
 	protected function setType(int $type){
 
 		$this->$_type = $type;
+		return $this;
 
 	}
 

@@ -34,27 +34,42 @@ class Condition{
 	function __destruct(){}
 
 	function getField(){
+
 		return $this->_field;
+
 	}
 
 	function getType(){
+
 		return $this->_type;
+
 	}
 
 	function getValue(){
+
 		return $this->_value;
+
 	}
 
 	function setField(string $field=NULL){
+
 		$this->_field = $field;
+		return $this;
+
 	}
 
 	function setType(int $type=NULL){
+
 		$this->_type = $type;
+		return $this;
+
 	}
 
 	function setValue(string $value=NULL){
+
 		$this->_value = $value;
+		return $this;
+
 	}
 
 }

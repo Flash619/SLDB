@@ -128,7 +128,7 @@ class SLDB{
 		}
 
 		//Save config for future reference
-		$this-$_config = $config;
+		$this->_config = $config;
 
 	}
 

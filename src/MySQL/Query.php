@@ -107,24 +107,6 @@ class Query extends BaseQuery{
 
 	}
 
-	protected function valuesToSyntax(array $values){
-
-		$result = array('syntax'=>'','params'=>array());
-		$s = '';
-
-		foreach( $values as $k => $v ){
-
-			$s=$k.' = '.'?, ';
-			$result['params'] = $v;
-
-		}
-
-		$result['syntax'] = $s;
-
-		return $result;
-
-	}
-
 	protected function generateSelectSyntax(){
 
 		$where = $this->operatorToSyntax( $this->_operator );
@@ -151,13 +133,22 @@ class Query extends BaseQuery{
 	protected function generateUpdateSyntax(){
 
 		$where  = $this->operatorToSyntax( $this->_operator );
-		$values = $this->valuesToSyntax( $this->_values );
+		$values = array('syntax'=>'','params'=>array());
+
+		foreach( $this->_values as $k => $v ){
+
+			$values['syntax']   = $values['syntax'].$k.' = '.'?,';
+			$values['params'][] = $v;
+
+		}
+
+		$values['syntax'] = rtrim($values['syntax'],',');
 
 		$s = "UPDATE ".$this->_table." SET ".$values['syntax']." WHERE ".$where['syntax'];
 
 		if( $this->_limit !== NULL ){
 
-			$s = $s.'LIMIT '.$this->_limit;
+			$s = $s.' LIMIT '.$this->_limit;
 
 		}
 
@@ -182,7 +173,7 @@ class Query extends BaseQuery{
 
 		$vs = rtrim($vs,',');
 
-		$s = "INSERT INTO ".$this->_table." ".implode(',',$fields)." VALUES (".$vs.")";
+		$s = "INSERT INTO ".$this->_table." (".implode(',',$fields).") VALUES (".$vs.")";
 
 		$this->_syntax = $s;
 		$this->_params = $values;
@@ -197,7 +188,7 @@ class Query extends BaseQuery{
 
 		if( $this->_limit !== NULL ){
 
-			$s = $s.'LIMIT '.$this->_limit;
+			$s = $s.' LIMIT '.$this->_limit;
 
 		}
 
