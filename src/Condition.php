@@ -100,7 +100,7 @@ class Condition{
 	* @param string $table The table this condition should apply to.
 	* @return SLDB\Condition This condition.
 	*/
-	function setTable(string $table){
+	function setTable(string $table=NULL){
 
 		$this->_table = $table;
 		return $this;

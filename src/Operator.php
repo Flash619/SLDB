@@ -138,17 +138,17 @@ class Operator{
 	/**
 	* Validates this operator and nested operators insuring that all tables and fields within this operator, are found within the table and field arrays provided to this function.
 	* @param string $primary_table The primary table to be used in a query with this operator.
-	* @param array $tables The tables this function should use as reference when validating table and field names.
+	* @param array $joined_tables The tables this function should use as reference when validating table and field names.
 	* @param array $fields The fields this function should use as reference when validating table and field names.
 	* @return boolean True if this operator is valid, otherwise False.
 	*/
-	function validate(array $primary_table,array $tables=NULL,array $fields=NULL){
+	function validate(string $primary_table,array $joined_tables,array $fields){
 
 		foreach( $this->_conditions as $condition ){
 
-			if( is_a( $v, 'SLDB\Operator' ) ){
+			if( is_a( $condition, 'SLDB\Operator' ) ){
 
-				if( ! $this->_validate( $tables, $fields ) ){
+				if( ! $this->_validate( $joined_tables, $fields ) ){
 
 					return false;
 
@@ -159,8 +159,9 @@ class Operator{
 			// Make sure that the Table exists within $tables and $fields if the Table is not NULL.
 
 			// If the conditions table is not in $tables, or the conditions table is not a key in fields, return false if the conditions table is not NULL.
-			if( ( ! in_array( $condition->getTable(), $tables ) || ! array_key_exists( $condition->getTable(), $fields ) ) && $condition->getTable() !== NULL ){
+			if( ( ! in_array( $condition->getTable(), $joined_tables ) || ! array_key_exists( $condition->getTable(), $fields ) ) && $condition->getTable() !== NULL ){
 
+				throw new InvalidOperatorArgumentsException("Table not NULL and Table not found within joined Tables or Fields!");
 				return false;
 
 			}
@@ -170,6 +171,7 @@ class Operator{
 			// If the conditions table is NULL and the conditions field is not found under $primary_table field array, return false.
 			if( $condition->getTable() === NULL && ! in_array( $condition->getField(), $fields[$primary_table] ) ){
 
+				throw new InvalidOperatorArgumentsException("Table NULL but does not exist within Fields!");
 				return false;
 
 			}
@@ -179,6 +181,7 @@ class Operator{
 			// If the conditions table is not NULL and the conditions field is not in the conditions table field array, return false.
 			if( $condition->getTable() !== NULL && ! in_array( $condition->getField(), $fields[ $condition->getTable() ] ) ){
 
+				throw new InvalidOperatorArgumentsException("Table not NULL but does not a key in Fields!");
 				return false;
 
 			}
