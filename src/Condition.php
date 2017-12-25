@@ -19,6 +19,11 @@ class Condition{
 	const LESS_OR_EQUAL_TO    = 8;
 
 	/**
+	* The table this condition should apply to. Useful only in cases of joined tables.
+	*/
+	private $_table;
+
+	/**
 	* The field this condition should apply to.
 	*/
 	private $_field;
@@ -36,8 +41,9 @@ class Condition{
 	/**
 	* Class Constructor
 	*/
-	function __construct(string $field=NULL,int $type=NULL,string $value=NULL){
+	function __construct(string $field=NULL,int $type=NULL,string $value=NULL,string $table=NULL){
 
+		$this->setTable($table);
 		$this->setField($field);
 		$this->setType($type);
 		$this->setValue($value);
@@ -48,6 +54,16 @@ class Condition{
 	* Class Deconstructor
 	*/
 	function __destruct(){}
+
+	/**
+	* Returns the table name this condition should apply to.
+	* @return string The table name this condition should apply to.
+	*/
+	function getTable(){
+
+		return $this->_table;
+
+	}
 
 	/**
 	* Returns the field name this condition should apply to.
@@ -76,6 +92,18 @@ class Condition{
 	function getValue(){
 
 		return $this->_value;
+
+	}
+
+	/**
+	* Sets the table name this condition should apply to.
+	* @param string $table The table this condition should apply to.
+	* @return SLDB\Condition This condition.
+	*/
+	function setTable(string $table){
+
+		$this->_table = $table;
+		return $this;
 
 	}
 

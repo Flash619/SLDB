@@ -2,6 +2,9 @@
 
 namespace SLDB\Base;
 
+use SLDB\Exception\InvalidQueryFieldException;
+use SLDB\Exception\InvalidQueryTypeException;
+use SLDB\Exception\InvalidQueryOperatorException;
 use SLDB\Base\Database as BaseDatabase;
 use SLDB\Operator;
 
@@ -28,6 +31,11 @@ class Query{
 	* The table name this database should target during execution.
 	*/
 	protected $_table;
+
+	/**
+	* The table names this query should join during execution.
+	*/
+	protected $_joined_tables;
 
 	/**
 	* The type of query that this query is.
@@ -128,23 +136,51 @@ class Query{
 	/**
 	* Sets the selected fields for this query to the field names in the provided array.
 	* @param array $fields An array of field names to reference or retrieve.
+	* @param string $table (Optional) Name of joined table whos fields should be set. If this value is not provided, it will be assumed all fields belong to the primary selected table.
 	* @return SLDB\Base\Query This query.
 	*/
-	function setFields(array $fields){
+	function setFields(array $fields,string $table=NULL){
 
-		$this->_fields = $fields;
+		if( $table === NULL ){
+
+			$table = $this->_table;
+
+		}
+
+		if(! array_key_exists( $table, $this->_fields ) ) ){
+
+			throw new InvalidQueryFieldException("The table name provided '".$table."' does not exist within this query.");
+
+		}
+
+		$this->_fields[$table] = $fields;
+
 		return $this;
-		
+
 	}
 
 	/**
 	* Adds a field name provided to the list of field names to be referenced or retrieved in this query.
 	* @param string $fields Field name to reference or retrieve.
+	* @param string $table (Optional) Name of joined table this field belongs to. If this value is not provided, it will be assumed the field belongs to the primary selected table.
 	* @return SLDB\Base\Query This query.
 	*/
-	function addField(string $field){
+	function addField(string $field,string $table=NULL){
 
-		$this->_fields[] = $field;
+		if( $table === NULL ){
+
+			$table = $this->_table;
+
+		}
+
+		if(! array_key_exists( $table, $this->_fields ) ){
+
+			throw new InvalidQueryFieldException("The table name provided '".$table."' does not exist within this query.");
+
+		}
+
+		$this->_fields[$table][] = $field;
+
 		return $this;
 		
 	}
@@ -170,6 +206,33 @@ class Query{
 	function addValues(array $values){
 
 		$this->_values = array_merge($this->_values, $values);
+		return $this;
+
+	}
+
+	/**
+	* Adds a joined table to this query. This is useful for MySQL or PostgreSQL when joining multiple tables for a single query.
+	* @param string $table Table name to join.
+	* @return SLDB\Base\Query This query.
+	*/
+	function addJoinedTable(string $table){
+
+		if( $this->_table != $table ){
+
+			if( ! in_array( $table, $this->_joined_tables ) ){
+
+				$this->_joined_tables[] = $table;
+
+			}
+
+			if( ! array_key_exists( $table, $this->_fields ) ){
+
+				$this->_fields[$table] = array();
+
+			}
+
+		}
+
 		return $this;
 
 	}
@@ -242,7 +305,14 @@ class Query{
 	*/
 	function setTable(string $table){
 
+		if( $this->_table !== NULL ){
+
+			unset( $this->_fields[ $this->_table ] );
+
+		}
+
 		$this->_table = $table;
+		$this->_fields[ $table ] = array();
 		return $this;
 
 	}
@@ -393,6 +463,12 @@ class Query{
 	*/
     function generate(){
 
+    	if( ! $this->_operator->validate( $this->_table, $this->_joined_tables, $this->_fields ) ){
+
+    		throw new InvalidQueryOperatorException("Operator table or field name not valid for this query.");
+
+    	}
+
 		switch($this->_type){
 			case self::SELECT:
 				$this->generateSelectSyntax();
@@ -433,5 +509,3 @@ class Query{
 	protected function generateDropSyntax(){}
 
 }
-class InvalidQueryTypeException extends \Exception{}
-class InvalidOperatorException extends \Exception{}
