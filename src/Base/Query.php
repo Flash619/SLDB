@@ -111,7 +111,7 @@ class Query{
 		$this->_values        =  array();
 		$this->_operator      =  NULL;
 		$this->_limit         =  NULL;
-		$this->_offest        =  NULL;
+		$this->_offset        =  NULL;
 
 		$this->_syntax        =  NULL;
 		$this->_params        =  array();
@@ -123,7 +123,7 @@ class Query{
 
 		if($type !== NULL){
 
-			$this->setType($type);
+			$this->type($type);
 
 		}
 
@@ -140,7 +140,7 @@ class Query{
 	* @param string $table (Optional) Name of joined table whos fields should be set. If this value is not provided, it will be assumed all fields belong to the primary selected table.
 	* @return SLDB\Base\Query This query.
 	*/
-	function setFields(array $fields,string $table=NULL){
+	function fetch(array $fields,string $table=NULL){
 
 		// Clear out all fields
 		$this->_fields = array();
@@ -148,21 +148,21 @@ class Query{
 		// Re create field key for primary table if required.
 		if( $this->_table !== NULL ){
 
-			$this->setTable( $this->getTable() );
+			$this->use( $this->getTable() );
 
 		}
 
 		// Re create field key for joined tables if required.
 		if( count( $this->_joined_tables ) > 0 ){
 
-			$this->setJoinedTables( $this->getJoinedTables() );
+			$this->joinTables( $this->getJoinedTables() );
 
 		}
 
 		// Add all requested fields.
 		foreach( $fields as $field ){
 
-			$this->addField( $field, $table );
+			$this->fetchSingle( $field, $table );
 
 		}
 
@@ -176,7 +176,7 @@ class Query{
 	* @param string $table (Optional) Name of joined table this field belongs to. If this value is not provided, it will be assumed the field belongs to the primary selected table.
 	* @return SLDB\Base\Query This query.
 	*/
-	function addField(string $field,string $table=NULL){
+	function fetchSingle(string $field,string $table=NULL){
 
 		if( $table === NULL ){
 
@@ -186,7 +186,7 @@ class Query{
 
 		if( $table === NULL ){
 
-			throw new InvalidQueryFieldException("Unable to add field to table 'NULL'.");
+			throw new InvalidQueryFieldException("Unable to assign field to table 'NULL'.");
 
 		}
 
@@ -208,7 +208,7 @@ class Query{
 	* @param string $value The value that should be assigned to this field.
 	* @return SLDB\Base\Query This query.
 	*/
-	function addValue(string $field, string $value){
+	function setSingle(string $field, string $value){
 
 		$this->_values[$field] = $value;
 		return $this;
@@ -216,13 +216,13 @@ class Query{
 	}
 
 	/**
-	* Adds as an array of values to the list of values to be assigned in this query.
-	* @param array $values An array of field names and values to add to the list of values to be assigned.
+	* Sets the values to be assigned in this query to the provided array of field names and values.
+	* @param array $values An array of field names and values to be assigned in this query.
 	* @return SLDB\Base\Query This query.
 	*/
-	function addValues(array $values){
+	function set(array $values){
 
-		$this->_values = array_merge($this->_values, $values);
+		$this->_values = $values;
 		return $this;
 
 	}
@@ -232,7 +232,7 @@ class Query{
 	* @param string $table Table name to join.
 	* @return SLDB\Base\Query This query.
 	*/
-	function addJoinedTable(string $table){
+	function joinSingle(string $table){
 
 		if( $this->_table != $table ){
 
@@ -259,28 +259,16 @@ class Query{
 	* @param array $joined_tables Tables name to join.
 	* @return SLDB\Base\Query This query.
 	*/
-	function setJoinedTables(array $joined_tables){
+	function join(array $joined_tables){
 
 		$this->_joined_tables = array();
 
 		foreach( $joined_tables as $table ){
 
-			$this->addJoinedTable( $table );
+			$this->joinSingle( $table );
 
 		}
 
-		return $this;
-
-	}
-
-	/**
-	* Sets the values to be assigned in this query to the provided array of field names and values.
-	* @param array $values An array of field names and values to be assigned in this query.
-	* @return SLDB\Base\Query This query.
-	*/
-	function setValues(array $values){
-
-		$this->_values = $values;
 		return $this;
 
 	}
@@ -303,7 +291,7 @@ class Query{
 	* @param int $limit The number of rows this query should affect.
 	* @return SLDB\Base\Query This query.
 	*/
-	function setLimit(int $limit){
+	function limit(int $limit){
 
 		$this->_limit = $limit;
 		return $this;
@@ -315,7 +303,7 @@ class Query{
 	* @param int $offset The ammount of rows this query should be offset by.
 	* @return SLDB\Base\Query This query.
 	*/
-	function setOffset(int $offset){
+	function offset(int $offset){
 
 		$this->_offset = $offset;
 		return $this;
@@ -327,7 +315,7 @@ class Query{
 	* @param int $type The SLDB\Base\Query constant that referrs to this queries type.
 	* @return SLDB\Base\Query This query.
 	*/
-	function setType(int $type){
+	function type(int $type){
 
 		$this->_type = $type;
 		return $this;
@@ -339,7 +327,7 @@ class Query{
 	* @param string The name of the table or collection this query should target.
 	* @return SLDB\Base\Query This query.
 	*/
-	function setTable(string $table){
+	function use(string $table){
 
 		if( $this->_table !== NULL ){
 
@@ -514,7 +502,7 @@ class Query{
 
     		if( ! $this->_operator->validate( $this->_table, $this->_joined_tables, $this->_fields ) ){
 
-    			throw new InvalidQueryOperatorException("Operator table or field not valid for this query.");
+    			throw new InvalidQueryOperatorException("Operator ");
 
     		}
 

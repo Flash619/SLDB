@@ -154,34 +154,15 @@ class Operator{
 
 				}
 
+				continue;
+
 			}
 
-			// Make sure that the Table exists within $tables and $fields if the Table is not NULL.
-
-			// If the conditions table is not in $tables, or the conditions table is not a key in fields, return false if the conditions table is not NULL.
+			// Make sure that the Table exists within $tables and $fields if the Table is not NULL. If the table is NULL, the Query object will assume this condition
+			// uses the $primary_table as the reference table during execution.
 			if( ( ! in_array( $condition->getTable(), $joined_tables ) || ! array_key_exists( $condition->getTable(), $fields ) ) && $condition->getTable() !== NULL ){
 
-				throw new InvalidOperatorArgumentsException("Table not NULL and Table not found within joined Tables or Fields!");
-				return false;
-
-			}
-
-			// If the table is NULL, make sure that the field for the condition exists within the proper field array for the Primary Table.
-
-			// If the conditions table is NULL and the conditions field is not found under $primary_table field array, return false.
-			if( $condition->getTable() === NULL && ! in_array( $condition->getField(), $fields[$primary_table] ) ){
-
-				throw new InvalidOperatorArgumentsException("Table NULL but does not exist within Fields!");
-				return false;
-
-			}
-
-			// If the table is not NULL, make sure that the field for the condition exists within the proper field array for the joined Table.
-
-			// If the conditions table is not NULL and the conditions field is not in the conditions table field array, return false.
-			if( $condition->getTable() !== NULL && ! in_array( $condition->getField(), $fields[ $condition->getTable() ] ) ){
-
-				throw new InvalidOperatorArgumentsException("Table not NULL but does not a key in Fields!");
+				throw new InvalidOperatorArgumentsException("Condition table '".$condition->getTable()."' does not exist withi query.");
 				return false;
 
 			}
