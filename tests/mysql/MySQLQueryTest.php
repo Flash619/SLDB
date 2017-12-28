@@ -99,7 +99,8 @@ class MySQLQueryTest extends TestCase{
  			'name'     => 'red and delicious',
  			'quantity' => 25,
  			'color'    => 'red',
- 		))->setSingle('size','small')->generate();
+ 			'size'     => 'small',
+ 		))->generate();
 
  		$a = "INSERT INTO test_table (name,quantity,color,size) VALUES (?,?,?,?)";
 

@@ -111,7 +111,7 @@ class Query extends BaseQuery{
 
 		$where = $this->operatorToSyntax( $this->_operator );
 
-		$s = "SELECT ".implode(',', $this->_fields[$this->_table])." FROM ".$this->_table." WHERE ".$where['syntax'];
+		$s = "SELECT ".implode(',', $this->_fetch[$this->_table])." FROM ".$this->_table." WHERE ".$where['syntax'];
 
 		if( $this->_limit !== NULL ){
 
@@ -135,7 +135,7 @@ class Query extends BaseQuery{
 		$where  = $this->operatorToSyntax( $this->_operator );
 		$values = array('syntax'=>'','params'=>array());
 
-		foreach( $this->_values as $k => $v ){
+		foreach( $this->_set as $k => $v ){
 
 			$values['syntax']   = $values['syntax'].$k.' = '.'?,';
 			$values['params'][] = $v;
@@ -163,7 +163,7 @@ class Query extends BaseQuery{
 		$values = array();
 		$vs     = '';
 
-		foreach( $this->_values as $k => $v ){
+		foreach( $this->_set as $k => $v ){
 
 			$fields[] = $k;
 			$values[] = $v;

@@ -5,6 +5,7 @@ namespace SLDB\Base;
 use SLDB\Exception\InvalidQueryFieldException;
 use SLDB\Exception\InvalidQueryTypeException;
 use SLDB\Exception\InvalidQueryOperatorException;
+use SLDB\Exception\InvalidQueryTableException;
 use SLDB\Base\Database as BaseDatabase;
 use SLDB\Operator;
 
@@ -35,7 +36,7 @@ class Query{
 	/**
 	* The table names this query should join during execution.
 	*/
-	protected $_joined_tables;
+	protected $_join;
 
 	/**
 	* The type of query that this query is.
@@ -43,14 +44,14 @@ class Query{
 	protected $_type;
 
 	/**
-	* The fields this query should select or refer to during execution.
+	* The fields this query should fetch or refer to during execution.
 	*/
-	protected $_fields;
+	protected $_fetch;
 
 	/**
 	* The values this query should assign to fields during execution.
 	*/
-	protected $_values;
+	protected $_set;
 
 	/**
 	* The operator this query should use during execution.
@@ -104,11 +105,11 @@ class Query{
 
 		$this->_database_type =  NULL;
 		$this->_table         =  NULL;
-		$this->_joined_tables =  array();
+		$this->_join =  array();
 		$this->_type          =  0;
 
-		$this->_fields        =  array();
-		$this->_values        =  array();
+		$this->_fetch        =  array();
+		$this->_set        =  array();
 		$this->_operator      =  NULL;
 		$this->_limit         =  NULL;
 		$this->_offset        =  NULL;
@@ -142,75 +143,38 @@ class Query{
 	*/
 	function fetch(array $fields,string $table=NULL){
 
-		// Clear out all fields
-		$this->_fields = array();
-
-		// Re create field key for primary table if required.
-		if( $this->_table !== NULL ){
-
-			$this->use( $this->getTable() );
-
-		}
-
-		// Re create field key for joined tables if required.
-		if( count( $this->_joined_tables ) > 0 ){
-
-			$this->joinTables( $this->getJoinedTables() );
-
-		}
-
-		// Add all requested fields.
-		foreach( $fields as $field ){
-
-			$this->fetchSingle( $field, $table );
-
-		}
-
-		return $this;
-
-	}
-
-	/**
-	* Adds a field name provided to the list of field names to be referenced or retrieved in this query.
-	* @param string $fields Field name to reference or retrieve.
-	* @param string $table (Optional) Name of joined table this field belongs to. If this value is not provided, it will be assumed the field belongs to the primary selected table.
-	* @return SLDB\Base\Query This query.
-	*/
-	function fetchSingle(string $field,string $table=NULL){
-
 		if( $table === NULL ){
 
 			$table = $this->_table;
 
 		}
 
-		if( $table === NULL ){
+		// Add all requested fields.
+		foreach( $fields as $field ){
 
-			throw new InvalidQueryFieldException("Unable to assign field to table 'NULL'.");
+			// If field is empty of NULL throw exception.
+			if( $field === NULL || empty( $field ) ){
+
+				throw new InvalidQueryFieldException("Field name cannot be NULL or empty.");
+
+			}
+
+			// If table was never added to this query throw exception.
+			if( ! array_key_exists( $table, $this->_fetch ) ){
+
+				throw new InvalidQueryFieldException("Table '".$table."'' does not exist within qeury.");
+
+			}
+
+			// If field already exists within table fetch array, skip.
+			if( ! in_array( $field, $this->_fetch[ $table ] ) ){
+
+				$this->_fetch[ $table ][] = $field;
+
+			}
 
 		}
 
-		if(! array_key_exists( $table, $this->_fields ) ){
-
-			throw new InvalidQueryFieldException("The table name provided '".$table."' does not exist within this query.");
-
-		}
-
-		$this->_fields[$table][] = $field;
-
-		return $this;
-		
-	}
-
-	/**
-	* Adds a value provided to the list of values to be assigned in this query.
-	* @param string $field The field this value should be assigned to.
-	* @param string $value The value that should be assigned to this field.
-	* @return SLDB\Base\Query This query.
-	*/
-	function setSingle(string $field, string $value){
-
-		$this->_values[$field] = $value;
 		return $this;
 
 	}
@@ -222,34 +186,7 @@ class Query{
 	*/
 	function set(array $values){
 
-		$this->_values = $values;
-		return $this;
-
-	}
-
-	/**
-	* Adds a joined table to this query. This is useful for MySQL or PostgreSQL when joining multiple tables for a single query.
-	* @param string $table Table name to join.
-	* @return SLDB\Base\Query This query.
-	*/
-	function joinSingle(string $table){
-
-		if( $this->_table != $table ){
-
-			if( ! in_array( $table, $this->_joined_tables ) ){
-
-				$this->_joined_tables[] = $table;
-
-			}
-
-			if( ! array_key_exists( $table, $this->_fields ) ){
-
-				$this->_fields[$table] = array();
-
-			}
-
-		}
-
+		$this->_set = $values;
 		return $this;
 
 	}
@@ -259,15 +196,9 @@ class Query{
 	* @param array $joined_tables Tables name to join.
 	* @return SLDB\Base\Query This query.
 	*/
-	function join(array $joined_tables){
+	function join(string $table, $local_field, $foreign_field, $foreign_table=NULL){
 
-		$this->_joined_tables = array();
 
-		foreach( $joined_tables as $table ){
-
-			$this->joinSingle( $table );
-
-		}
 
 		return $this;
 
@@ -279,6 +210,8 @@ class Query{
 	* @return SLDB\Base\Query This query.
 	*/
 	function setOperator(Operator $operator){
+
+		//Operator validation is ran from Query::generate() as Operator validation requires all other parameters first.
 
 		$this->_operator = $operator;
 		return $this;
@@ -317,6 +250,8 @@ class Query{
 	*/
 	function type(int $type){
 
+		// Query type validation is handled by the Query::generate() function within the primary switch statement.
+
 		$this->_type = $type;
 		return $this;
 
@@ -329,14 +264,15 @@ class Query{
 	*/
 	function use(string $table){
 
+		// If we are switching tables, clear out the old table.
 		if( $this->_table !== NULL ){
 
-			unset( $this->_fields[ $this->_table ] );
+			unset( $this->_fetch[ $this->_table ] );
 
 		}
 
 		$this->_table = $table;
-		$this->_fields[ $table ] = array();
+		$this->_fetch[ $table ] = array();
 		return $this;
 
 	}
@@ -417,7 +353,7 @@ class Query{
 	*/
 	function getJoinedTables(){
 
-		return $this->_joined_tables;
+		return $this->_join;
 
 	}
 
@@ -447,7 +383,7 @@ class Query{
 	*/
 	function getValues(){
 
-		return $this->_values;
+		return $this->_set;
 
 	}
 
@@ -500,14 +436,20 @@ class Query{
     	// Not all query types use operators.
     	if( $this->_type !== self::INSERT && $this->_type !== self::CREATE ){
 
-    		if( ! $this->_operator->validate( $this->_table, $this->_joined_tables, $this->_fields ) ){
+    		// Validate the operator and pass the error along to the stack.
+    		try{
 
-    			throw new InvalidQueryOperatorException("Operator ");
+    			$this->_operator->validate( $this->_table, $this->_join, $this->_fetch );
+
+    		}catch( Exception $e ){
+
+    			throw new InvalidQueryOperatorException("Failed to validate operator. ( ".$e->getMessage()." )");
 
     		}
 
     	}
 
+    	// Generate query syntax based on query type.
 		switch($this->_type){
 			case self::SELECT:
 				$this->generateSelectSyntax();
@@ -532,6 +474,8 @@ class Query{
 		}
 
 	}
+
+	// Functions to override for child classes.
 
 	protected function operatorToSyntax(Operator $operator){}
 
