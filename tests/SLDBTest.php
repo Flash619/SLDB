@@ -18,7 +18,9 @@ class SLDBTest extends TestCase{
  			)
  		);
 
- 		$this->AssertEquals($sldb->getDatabase()::MYSQL,$sldb->getDatabase()->getType(),"SLDB failed to initialize correct database type.");
+ 		$db = $sldb->getDatabase();
+
+ 		$this->AssertEquals($db::MYSQL,$sldb->getDatabase()->getType(),"SLDB failed to initialize correct database type.");
 
  	}
 

@@ -27,7 +27,7 @@ class Database extends BaseDatabase{
 
 	}
 
-	function initQuery(int $type=NULL){
+	function initQuery(string $type=NULL){
 
 		return new MySQLQuery($type);
 

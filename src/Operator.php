@@ -12,8 +12,8 @@ use SLDB\Condition;
 class Operator{
 
 	// Constants used for operator type identification.
-	const AND_OPERATOR = 1;
-	const OR_OPERATOR  = 2;
+	const AND_OPERATOR = 'AND_OPERATOR';
+	const OR_OPERATOR  = 'OR_OPERATOR';
 
 	/**
 	* The type of operator that this operator is.
@@ -28,7 +28,7 @@ class Operator{
 	/**
 	* Class Constructor
 	*/
-	function __construct(int $type=NULL,array $conditions=NULL){
+	function __construct(string $type=NULL,array $conditions=NULL){
 
 		if( $type !== NULL ){
 
@@ -142,13 +142,15 @@ class Operator{
 	* @param array $fields The fields this function should use as reference when validating table and field names.
 	* @return boolean True if this operator is valid, otherwise False.
 	*/
-	function validate(string $primary_table,array $joined_tables,array $fields){
+	function validate(string $table,array $joins,array $fields){
+
+        $tableExists = false;
 
 		foreach( $this->_conditions as $condition ){
 
 			if( is_a( $condition, 'SLDB\Operator' ) ){
 
-				if( ! $this->_validate( $joined_tables, $fields ) ){
+				if( ! $this->_validate( $joins, $fields ) ){
 
 					return false;
 
@@ -160,12 +162,27 @@ class Operator{
 
 			// Make sure that the Table exists within $tables and $fields if the Table is not NULL. If the table is NULL, the Query object will assume this condition
 			// uses the $primary_table as the reference table during execution.
-			if( ( ! in_array( $condition->getTable(), $joined_tables ) || ! array_key_exists( $condition->getTable(), $fields ) ) && $condition->getTable() !== NULL ){
 
-				throw new InvalidOperatorArgumentsException("Condition table '".$condition->getTable()."' does not exist withi query.");
-				return false;
+            if( $condition->getTable() === $table ) {
 
-			}
+                $tableExists = true;
+
+            }
+
+            foreach( $joins as $k => $v ) {
+
+                if ( $v->getForeignTable() === $condition->getTable() ) {
+
+                    $tableExists = true;
+
+                }
+
+            }
+
+            if(! $tableExists ) {
+                throw new InvalidOperatorArgumentsException("Condition table '" . $condition->getTable() . "' does not exist within query.");
+                return false;
+            }
 
 		}
 

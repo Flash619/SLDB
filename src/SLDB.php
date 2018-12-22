@@ -136,7 +136,7 @@ class SLDB{
 
 	function select(string $table=NULL,array $fields=NULL,array $operator=NULL,int $limit=NULL,int $offset=NULL){
 		
-		if( $table === NULL || $fields === NULL || $conditions === NULL ){return NULL;}
+		if( $table === NULL || $fields === NULL ){return NULL;}
 
 		$query = $this->_database->initQuery(QueryType::SELECT);
 
@@ -192,7 +192,7 @@ class SLDB{
 
 	function delete(string $table=NULL,array $operator=NULL,int $limit=NULL){
 
-		if( $table === NULL || $conditions === NULL ){return NULL;}
+		if( $table === NULL ){return NULL;}
 
 		$query = $this->_database->initQuery(QueryType::DELETE);
 

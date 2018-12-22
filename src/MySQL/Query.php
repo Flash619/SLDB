@@ -1,6 +1,6 @@
 <?php
 
-namespace SLDB\MySQL;
+namespace SLDB\mysql;
 
 use SLDB\Base\Query    as BaseQuery;
 use SLDB\Base\Database as BaseDatabase;
@@ -12,7 +12,7 @@ class Query extends BaseQuery{
 	/**
 	* Class Constructor
 	*/
-	function __construct(int $type=NULL){
+	function __construct(string $type=NULL){
 
 		BaseQuery::__construct($type);
 
@@ -111,7 +111,19 @@ class Query extends BaseQuery{
 
 		$where = $this->operatorToSyntax( $this->_operator );
 
-		$s = "SELECT ".implode(',', $this->_fetch[$this->_table])." FROM ".$this->_table." WHERE ".$where['syntax'];
+		$s = "SELECT ".implode(',', $this->_fetch[$this->_table])." FROM ".$this->_table . ' ';
+
+		if( count($this->_join) !== 0 ){
+
+            foreach( $this->_join as $k => $v ){
+
+                $s = $s . $v->getSyntax() . ' ';
+
+            }
+
+        }
+
+		$s = $s . "WHERE ".$where['syntax'];
 
 		if( $this->_limit !== NULL ){
 

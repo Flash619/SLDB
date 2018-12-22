@@ -6,9 +6,9 @@ use SLDB\Base\Query as BaseQuery;
 
 class Database{
 
-	const MYSQL      = 1;
-	const POSTGRESQL = 2;
-	const MONGODB    = 3;
+	const MYSQL      = 'MYSQL';
+	const POSTGRESQL = 'POSTGRESQL';
+	const MONGODB    = 'MONGODB';
 
 	protected $_type;
 	protected $_config;
@@ -34,7 +34,7 @@ class Database{
 
 	}
 
-	function initQuery(int $type=NULL){
+	function initQuery(string $type=NULL){
 
 		return new BaseQuery($this,$type);
 
@@ -54,7 +54,7 @@ class Database{
 
 	protected function setType(int $type){
 
-		$this->$_type = $type;
+		$this->_type = $type;
 		return $this;
 
 	}

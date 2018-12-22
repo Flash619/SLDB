@@ -9,14 +9,14 @@ namespace SLDB;
 class Condition{
 
 	// Constants used for condition type identification.
-	const LIKE                = 1;
-	const NOT_LIKE            = 2;
-	const EQUAL_TO            = 3;
-	const NOT_EQUAL_TO        = 4;
-	consT GREATER_THAN        = 5;
-	const LESS_THAN           = 6;
-	const GREATER_OR_EQUAL_TO = 7;
-	const LESS_OR_EQUAL_TO    = 8;
+	const LIKE                = 'LIKE';
+	const NOT_LIKE            = 'NOT_LIKE';
+	const EQUAL_TO            = 'EQUAL_TO';
+	const NOT_EQUAL_TO        = 'NOT_EQUAL_TO';
+	consT GREATER_THAN        = 'GREATER_THAN';
+	const LESS_THAN           = 'LESS_THAN';
+	const GREATER_OR_EQUAL_TO = 'GREATER_OR_EQUAL_TO';
+	const LESS_OR_EQUAL_TO    = 'LESS_OR_EQUAL_TO';
 
 	/**
 	* The table this condition should apply to. Useful only in cases of joined tables.
@@ -41,7 +41,7 @@ class Condition{
 	/**
 	* Class Constructor
 	*/
-	function __construct(string $field=NULL,int $type=NULL,string $value=NULL,string $table=NULL){
+	function __construct(string $table=NULL,string $field=NULL,string $type=NULL,string $value=NULL){
 
 		$this->setTable($table);
 		$this->setField($field);
@@ -124,7 +124,7 @@ class Condition{
 	* @param int $type The type of condition that should apply to this condition.
 	* @return SLDB\Condition This condition.
 	*/
-	function setType(int $type=NULL){
+	function setType(string $type=NULL){
 
 		$this->_type = $type;
 		return $this;

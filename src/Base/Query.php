@@ -1,7 +1,9 @@
 <?php
 
-namespace SLDB\Base;
+namespace SLDB\base;
 
+use phpDocumentor\Reflection\Types\Array_;
+use phpDocumentor\Reflection\Types\String_;
 use SLDB\Exception\InvalidQueryFieldException;
 use SLDB\Exception\InvalidQueryTypeException;
 use SLDB\Exception\InvalidQueryOperatorException;
@@ -16,12 +18,12 @@ use SLDB\Operator;
 class Query{
 
 	// Constants used for query type identification.
-	const SELECT  = 1;
-	const UPDATE  = 2;
-	const INSERT  = 3;
-	const DELETE  = 4;
-	const CREATE  = 5;
-	const DROP    = 6;
+	const SELECT  = 'QUERY_SELECT';
+	const UPDATE  = 'QUERY_UPDATE';
+	const INSERT  = 'QUERY_INSERT';
+	const DELETE  = 'QUERY_DELETE';
+	const CREATE  = 'QUERY_CREATE';
+	const DROP    = 'QUERY_DROP';
 
 	/**
 	* The type of database this query is designed for.
@@ -29,7 +31,7 @@ class Query{
 	protected $_database_type;
 
 	/**
-	* The table name this database should target during execution.
+	* The primary table this query should use.
 	*/
 	protected $_table;
 
@@ -39,52 +41,52 @@ class Query{
 	protected $_join;
 
 	/**
-	* The type of query that this query is.
+	* The type of query to perform.
 	*/
 	protected $_type;
 
 	/**
-	* The fields this query should fetch or refer to during execution.
+	* The fields this query should fetch.
 	*/
 	protected $_fetch;
 
 	/**
-	* The values this query should assign to fields during execution.
+	* The values this query should assign to fields.
 	*/
 	protected $_set;
 
 	/**
-	* The operator this query should use during execution.
+	* The operator this query should use.
 	*/
 	protected $_operator;
 
 	/**
-	* The ammount of rows this query should be limited to during execution.
+	* The amount of rows this query should be limited.
 	*/
 	protected $_limit;
 
 	/**
-	* The ammount of rows this query should be offset by during execution.
+	* The amount of rows this query should be offset by.
 	*/
 	protected $_offset;
 
 	/**
-	* The syntax this query should use during execution, generated via the Query::generate() function.
+	* The syntax this query should use, generated via the Query::generate() function.
 	*/
 	protected $_syntax;
 
 	/**
-	* The array of params this query should use during execution in reference to the syntax this query has generated.
+	* The array of params this query should use in reference to the syntax this query has generated.
 	*/
 	protected $_params;
 
 	/**
-	* The rows returned from a select query during execution.
+	* The rows returned from a select query.
 	*/
 	protected $_rows_returned;
 
 	/**
-	* The number of rows this query has affected during execution.
+	* The number of rows this query has affected.
 	*/
 	protected $_rows_affected;
 
@@ -101,15 +103,15 @@ class Query{
 	/**
 	* Class Constructor
 	*/
-	function __construct(int $type=NULL){
+	function __construct(string $type=NULL){
 
 		$this->_database_type =  NULL;
 		$this->_table         =  NULL;
-		$this->_join =  array();
+		$this->_join          =  array();
 		$this->_type          =  0;
 
-		$this->_fetch        =  array();
-		$this->_set        =  array();
+		$this->_fetch         =  array();
+		$this->_set           =  array();
 		$this->_operator      =  NULL;
 		$this->_limit         =  NULL;
 		$this->_offset        =  NULL;
@@ -159,12 +161,36 @@ class Query{
 
 			}
 
-			// If table was never added to this query throw exception.
-			if( ! array_key_exists( $table, $this->_fetch ) ){
+			$tableExists = false;
 
-				throw new InvalidQueryFieldException("Table '".$table."'' does not exist within qeury.");
+			// If table was never added to this query throw exception.
+			if( array_key_exists( $table, $this->_fetch ) ){
+
+			    $tableExists = true;
 
 			}
+
+			foreach( $this->_join as $k => $v ){
+
+			    if( $v->getForeignTable() === $table ){
+
+			        $tableExists = true;
+
+                }
+
+            }
+
+			if(! $tableExists ){
+
+                throw new InvalidQueryFieldException("Table '".$table."'' does not exist within query.");
+
+            }
+
+			if( ! array_key_exists($table, $this->_fetch) ){
+
+                $this->_fetch[ $table ] = array();
+
+            }
 
 			// If field already exists within table fetch array, skip.
 			if( ! in_array( $field, $this->_fetch[ $table ] ) ){
@@ -196,9 +222,9 @@ class Query{
 	* @param array $joined_tables Tables name to join.
 	* @return SLDB\Base\Query This query.
 	*/
-	function join(string $table, $local_field, $foreign_field, $foreign_table=NULL){
+	function join(Join $join){
 
-
+	    $this->_join[] = $join;
 
 		return $this;
 
@@ -248,7 +274,7 @@ class Query{
 	* @param int $type The SLDB\Base\Query constant that referrs to this queries type.
 	* @return SLDB\Base\Query This query.
 	*/
-	function type(int $type){
+	function type(string $type){
 
 		// Query type validation is handled by the Query::generate() function within the primary switch statement.
 
