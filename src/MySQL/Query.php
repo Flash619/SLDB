@@ -31,9 +31,24 @@ class Query extends BaseQuery{
 
 		$where = $this->_operator->generate()->getSyntax();
 
-		$s = "SELECT ".implode(',', $this->_fetch[$this->_table])." FROM ".$this->_table . ' ';
+		$s = "SELECT ";
+
+		foreach( $this->_fetch as $k => $v ){
+
+		    foreach( $v as $f ){
+
+		        $s .= $k . '.' . $f . ',';
+
+            }
+
+        }
+
+		$s = rtrim($s,',');
+		$s .= ' FROM '.$this->_table;
 
 		if( count($this->_join) !== 0 ){
+
+		    $s .= ' ';
 
             foreach( $this->_join as $k => $v ){
 
@@ -43,21 +58,22 @@ class Query extends BaseQuery{
 
         }
 
-		$s = $s . "WHERE ".$where;
+		$s .= " WHERE ".$where;
 
 		if( $this->_limit !== NULL ){
 
-			$s = $s.' LIMIT '.$this->_limit;
+			$s .= ' LIMIT '.$this->_limit;
 
 		}
 
 		if( $this->_offset !== NULL ){
 
-			$s = $s.' OFFSET '.$this->_offset;
+			$s .= ' OFFSET '.$this->_offset;
 
 		}
 
 		$this->_params = $this->_operator->getParams();
+
 		$this->_syntax = $s;
 
 	}
@@ -80,7 +96,7 @@ class Query extends BaseQuery{
 
 		if( $this->_limit !== NULL ){
 
-			$s = $s.' LIMIT '.$this->_limit;
+			$s .= ' LIMIT '.$this->_limit;
 
 		}
 
@@ -120,7 +136,7 @@ class Query extends BaseQuery{
 
 		if( $this->_limit !== NULL ){
 
-			$s = $s.' LIMIT '.$this->_limit;
+			$s .= ' LIMIT '.$this->_limit;
 
 		}
 

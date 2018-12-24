@@ -12,19 +12,19 @@ class MySQLQueryTest extends TestCase{
  	function testInitializeObject(){
 
  		$db = new Database();
- 		$query = $db->initQuery(Query::SELECT);
+ 		$query = $db->initQuery();
 
  		$this->AssertFalse((! is_a($query, 'SLDB\MySQL\Query')),"Failed to initialize MySQL Database object.");
- 		$this->AssertEquals(Query::SELECT,$query->getType(),"Database queryInit() returned invalid object.");
+ 		$this->AssertEquals(NULL,$query->getType(),"Database queryInit() returned invalid object.");
  		$this->AssertEquals(Database::MYSQL,$query->getDatabaseType(),"Database queryInit() returned Query with invalid database type.");
 
  	}
 
  	function testMySQLSelectQuery(){
 
- 		$query = new Query(Query::SELECT);
+ 		$query = new Query();
 
- 		$query->use('test_table')->fetch(array('id','name','quantity'))->setOperator(new Operator(
+ 		$query->select(array('id','name','quantity'),'test_table')->setOperator(new Operator(
  			Operator::AND_OPERATOR,
  			array(
  				new Condition('test_table','color',Condition::NOT_EQUAL_TO,'blue'),
@@ -32,7 +32,7 @@ class MySQLQueryTest extends TestCase{
  			)
  		))->limit(15)->offset(15)->generate();
 
- 		$a = "SELECT id,name,quantity FROM test_table WHERE color != ? AND size > ? LIMIT 15 OFFSET 15";
+ 		$a = "SELECT test_table.id,test_table.name,test_table.quantity FROM test_table WHERE color != ? AND size > ? LIMIT 15 OFFSET 15";
 
  		$b = $query->getSyntax();
  		$p = $query->getParams();
@@ -46,26 +46,26 @@ class MySQLQueryTest extends TestCase{
 
  	function testMySQLSelectJoinQuery(){
 
- 		$query = new Query(Query::SELECT);
+ 		$query = new Query();
 
- 		$query->use('test_table') // Use test_table as primary table 'a'.
- 		->fetch(
+ 		$query->select(
  			array(
  				'id',
  				'name',
  				'quantity'
- 			) // From primary test_table 'a'.
+ 			),
+            'test_table'
  		)
  		->join(new Join(Join::INNER_JOIN,'test_table_b','id','test_table', 'id')) // Join test_table_b on test_table_b.id = test_table.id.
         ->join(new Join(Join::INNER_JOIN,'test_table_c','condition','test_table_b', 'condition')) // Join test_table_c on test_table_c.condition = test_table_b.condition.
- 		->fetch(
+ 		->select(
  			array(
  				'id',
  				'color',
  				'size',
  				'condition',
  			),  'test_table_b' // Fetch from joined test_table_b 'b'.
- 		)->fetch(
+ 		)->select(
  			array(
  				'id',
  				'color',
@@ -80,7 +80,7 @@ class MySQLQueryTest extends TestCase{
  			)
  		))->limit(15)->offset(15)->generate();
 
- 		$a = "SELECT id,name,quantity FROM test_table INNER JOIN test_table ON test_table.id = test_table_b.id INNER JOIN test_table_b ON test_table_b.condition = test_table_c.condition WHERE color != ? AND size > ? AND condition LIKE ? LIMIT 15 OFFSET 15";
+ 		$a = "SELECT test_table.id,test_table.name,test_table.quantity,test_table_b.id,test_table_b.color,test_table_b.size,test_table_b.condition,test_table_c.id,test_table_c.color,test_table_c.condition FROM test_table INNER JOIN test_table ON test_table.id = test_table_b.id INNER JOIN test_table_b ON test_table_b.condition = test_table_c.condition  WHERE color != ? AND size > ? AND condition LIKE ? LIMIT 15 OFFSET 15";
 
  		$b = $query->getSyntax();
  		$p = $query->getParams();
@@ -94,9 +94,9 @@ class MySQLQueryTest extends TestCase{
 
  	function testMySQLInsertQuery(){
 
- 		$query = new Query(Query::INSERT);
+ 		$query = new Query();
 
- 		$query->use('test_table')->set(array(
+ 		$query->insert('test_table')->set(array(
  			'name'     => 'red and delicious',
  			'quantity' => 25,
  			'color'    => 'red',
@@ -116,9 +116,9 @@ class MySQLQueryTest extends TestCase{
 
  	function testMySQLDeleteQuery(){
 
- 		$query = new Query(Query::DELETE);
+ 		$query = new Query();
 
- 		$query->use('test_table')->setOperator(new Operator(
+ 		$query->delete('test_table')->setOperator(new Operator(
  			Operator::AND_OPERATOR,
  			array(
  				new Condition('test_table','color',Condition::EQUAL_TO,'blue'),
@@ -140,9 +140,9 @@ class MySQLQueryTest extends TestCase{
 
  	function testMySQLUpdateQuery(){
 
- 		$query = new Query(Query::UPDATE);
+ 		$query = new Query();
 
- 		$query->use('test_table')->set(array(
+ 		$query->update('test_table')->set(array(
  			'color'    => 'red',
  			'quantity' => 20,
  		))->setOperator(new Operator(

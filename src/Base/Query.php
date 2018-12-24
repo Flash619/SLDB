@@ -96,14 +96,13 @@ class Query{
 
     /**
      * Query constructor.
-     * @param string|NULL $type Query type.
      */
-	function __construct(string $type=NULL){
+	function __construct(){
 
 		$this->_database_type =  NULL;
 		$this->_table         =  NULL;
 		$this->_join          =  array();
-		$this->_type          =  0;
+		$this->_type          =  NULL;
 
 		$this->_fetch         =  array();
 		$this->_set           =  array();
@@ -119,12 +118,6 @@ class Query{
 		$this->_message       =  NULL;
 		$this->_error         =  NULL;
 
-		if($type !== NULL){
-
-			$this->type($type);
-
-		}
-
 	}
 
 	/**
@@ -133,21 +126,34 @@ class Query{
 	function __destruct(){}
 
 	/**
-	* Sets the selected fields for this query to the field names in the provided array.
+	* Sets this query to be a select query using the fields provided. This function can be called multiple times for join
+    * queries,
 	* @param array $fields An array of field names to reference or retrieve.
-	* @param string $table (Optional) Name of joined table whos fields should be set. If this value is not provided, it
+	* @param string $table (Optional) Name of joined table who's fields should be set. If this value is not provided, it
     * will be assumed all fields belong to the primary selected table.
 	* @return Query This query.
-    * @throws InvalidQueryFieldException If a field defined in this query references a table not found within this
-    * query, or a field is NULL or empty.
+    * @throws InvalidQueryFieldException
+    * @throws InvalidQueryTypeException
 	*/
-	function fetch(array $fields,string $table=NULL){
+	function select(array $fields, string $table=NULL){
 
-		if( $table === NULL ){
+        if( $this->_table === NULL ){
+
+            $this->setTable($table);
+
+        }
+
+        if( $table === NULL ){
 
 			$table = $this->_table;
 
 		}
+
+        if( $this->_type === NULL ){
+
+            $this->setType(Query::SELECT);
+
+        }
 
 		// Add all requested fields.
 		foreach( $fields as $field ){
@@ -180,7 +186,7 @@ class Query{
 
 			if(! $tableExists ){
 
-                throw new InvalidQueryFieldException("Table '".$table."'' does not exist within query.");
+                throw new InvalidQueryFieldException("Table '".$table."' does not exist within query.");
 
             }
 
@@ -207,6 +213,7 @@ class Query{
 	* Sets the values to be assigned in this query to the provided array of field names and values.
 	* @param array $values An array of field names and values to be assigned in this query.
 	* @return Query This query.
+    * @throws InvalidQueryTypeException
 	*/
 	function set(array $values){
 
@@ -214,6 +221,66 @@ class Query{
 		return $this;
 
 	}
+
+    /**
+     * Sets this query to be a delete query, deleting from the table provided.
+     * @param string $table
+     * @return $this
+     * @throws InvalidQueryTypeException
+     */
+	function delete($table=NULL){
+
+        if( $table !== NULL ){
+
+            $this->setTable($table);
+
+        }
+
+	    $this->setType(Query::DELETE);
+
+        return $this;
+
+    }
+
+    /**
+     * Sets this query to be a insert query, inserting into the table provided.
+     * @param null $table
+     * @return $this
+     * @throws InvalidQueryTypeException
+     */
+    function insert($table=NULL){
+
+	    if( $table !== NULL ){
+
+	        $this->setTable($table);
+
+        }
+
+	    $this->setType(Query::INSERT);
+
+        return $this;
+
+    }
+
+    /**
+     * Sets this query to be a update query, updating the table provided.
+     * @param null $table
+     * @return $this
+     * @throws InvalidQueryTypeException
+     */
+    function update($table=NULL){
+
+        if( $table !== NULL ){
+
+            $this->setTable($table);
+
+        }
+
+        $this->setType(Query::UPDATE);
+
+        return $this;
+
+    }
 
 	/**
 	* Sets the tables to join for this query. This is useful for MySQL or PostgreSQL when joining multiple tables for a single query.
@@ -227,6 +294,43 @@ class Query{
 		return $this;
 
 	}
+
+    /**
+     * Sets the type for this query.
+     * @param string $type
+     * @throws InvalidQueryTypeException
+     */
+	protected function setType(string $type){
+
+	    if( $this->_type !== NULL ){
+
+	        throw new InvalidQueryTypeException('Query type is already set.');
+
+        }
+
+	    $this->_type = $type;
+
+    }
+
+    /**
+     * Sets the primary table used for this query.
+     * @param string $table
+     * @return $this
+     */
+    function setTable(string $table){
+
+        // If we are switching tables, clear out the old table.
+        if( $this->_table !== NULL ){
+
+            unset( $this->_fetch[ $this->_table ] );
+
+        }
+
+        $this->_table = $table;
+        $this->_fetch[ $table ] = array();
+        return $this;
+
+    }
 
 	/**
 	* Sets the operator in this query to the operator provided.
@@ -277,26 +381,6 @@ class Query{
 		// Query type validation is handled by the Query::generate() function within the primary switch statement.
 
 		$this->_type = $type;
-		return $this;
-
-	}
-
-	/**
-	* Sets the table or collection this query should target.
-	* @param string The name of the table or collection this query should target.
-	* @return Query
-	*/
-	function use(string $table){
-
-		// If we are switching tables, clear out the old table.
-		if( $this->_table !== NULL ){
-
-			unset( $this->_fetch[ $this->_table ] );
-
-		}
-
-		$this->_table = $table;
-		$this->_fetch[ $table ] = array();
 		return $this;
 
 	}
