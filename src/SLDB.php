@@ -77,7 +77,6 @@ class SLDB{
 	* Imports a configuration array to SLDB and verifies the accuracy of configuration keys
 	* as well as sets up required classes/variables within SLDS to match the supplied
 	* configuration options.
-	* @author Travis Truttschel
 	* @since 1.0.0
 	* @param array
 	* @throws InvalidConfigurationExceiption

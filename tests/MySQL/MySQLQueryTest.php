@@ -4,8 +4,8 @@ use PHPUnit\Framework\TestCase;
 use SLDB\MySQL\Database as Database;
 use SLDB\MySQL\Query as Query;
 use SLDB\MySQL\Join as Join;
-use SLDB\Condition;
-use SLDB\Operator;
+use SLDB\MySQL\Condition;
+use SLDB\MySQL\Operator;
 
 class MySQLQueryTest extends TestCase{
 

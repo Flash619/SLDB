@@ -4,8 +4,6 @@ namespace SLDB\mysql;
 
 use SLDB\Base\Query    as BaseQuery;
 use SLDB\Base\Database as BaseDatabase;
-use SLDB\Operator;
-use SLDB\Condition;
 
 class Query extends BaseQuery{
 
@@ -29,87 +27,9 @@ class Query extends BaseQuery{
 
 	}
 
-	protected function operatorToSyntax(Operator $operator){
-
-		$result = array('syntax'=>'','params'=>array());
-		$s = '';
-
-		foreach( $operator->getConditions() as $v ){
-
-			if( is_a( $v, 'SLDB\Operator' ) ){
-
-				$subresult = $this->operatorToSyntax( $v );
-				$s = $s.' ('.$subresult['syntax'].') ';
-				$result['params'] = array_merge( $result['params'], $subresult['params'] );
-
-				continue;
-
-			}
-
-			$ss = $v->getField();
-
-			switch( $v->getType() ){
-				case Condition::LIKE:
-					$ss = $ss.' LIKE ';
-					break;
-				case Condition::NOT_LIKE:
-					$ss = $ss.' NOT LIKE ';
-					break;
-				case Condition::EQUAL_TO:
-					$ss = $ss.' = ';
-					break;
-				case Condition::NOT_EQUAL_TO:
-					$ss = $ss.' != ';
-					break;
-				case Condition::GREATER_THAN:
-					$ss = $ss.' > ';
-					break;
-				case Condition::LESS_THAN:
-					$ss = $ss.' < ';
-					break;
-				case Condition::GREATER_OR_EQUAL_TO:
-					$ss = $ss.' >= ';
-					break;
-				case Condition::LESS_OR_EQUAL_TO:
-					$ss = $ss.' <= ';
-					break;
-			}
-
-			$ss = $ss.'?';
-
-			switch( $operator->getType() ){
-				case Operator::AND_OPERATOR:
-					$ss = $ss.' AND ';
-					break;
-				case Operator::OR_OPERATOR:
-					$ss = $ss.' OR ';
-					break;
-			}
-
-			$s = $s.$ss;
-
-			$result['params'][] = $v->getValue();
-
-		}
-
-		switch( $operator->getType() ){
-			case Operator::AND_OPERATOR:
-				$s = rtrim($s,' AND ');
-				break;
-			case Operator::OR_OPERATOR:
-				$s = rtrim($s,' OR ');
-				break;
-		}
-
-		$result['syntax'] = $s;
-
-		return $result;
-
-	}
-
 	protected function generateSelectSyntax(){
 
-		$where = $this->operatorToSyntax( $this->_operator );
+		$where = $this->_operator->generate()->getSyntax();
 
 		$s = "SELECT ".implode(',', $this->_fetch[$this->_table])." FROM ".$this->_table . ' ';
 
@@ -123,7 +43,7 @@ class Query extends BaseQuery{
 
         }
 
-		$s = $s . "WHERE ".$where['syntax'];
+		$s = $s . "WHERE ".$where;
 
 		if( $this->_limit !== NULL ){
 
@@ -137,14 +57,14 @@ class Query extends BaseQuery{
 
 		}
 
-		$this->_params = $where['params'];
+		$this->_params = $this->_operator->getParams();
 		$this->_syntax = $s;
 
 	}
 
 	protected function generateUpdateSyntax(){
 
-		$where  = $this->operatorToSyntax( $this->_operator );
+		$where  = $this->_operator->generate()->getSyntax();
 		$values = array('syntax'=>'','params'=>array());
 
 		foreach( $this->_set as $k => $v ){
@@ -156,7 +76,7 @@ class Query extends BaseQuery{
 
 		$values['syntax'] = rtrim($values['syntax'],',');
 
-		$s = "UPDATE ".$this->_table." SET ".$values['syntax']." WHERE ".$where['syntax'];
+		$s = "UPDATE ".$this->_table." SET ".$values['syntax']." WHERE ".$where;
 
 		if( $this->_limit !== NULL ){
 
@@ -164,7 +84,7 @@ class Query extends BaseQuery{
 
 		}
 
-		$this->_params = array_merge($values['params'],$where['params']);
+		$this->_params = array_merge($values['params'],$this->_operator->getParams());
 		$this->_syntax = $s;
 
 	}
@@ -194,9 +114,9 @@ class Query extends BaseQuery{
 
 	protected function generateDeleteSyntax(){
 
-		$where  = $this->operatorToSyntax( $this->_operator );
+		$where  = $this->_operator->generate()->getSyntax();
 
-		$s = "DELETE FROM ".$this->_table." WHERE ".$where['syntax'];
+		$s = "DELETE FROM ".$this->_table." WHERE ".$where;
 
 		if( $this->_limit !== NULL ){
 
@@ -204,7 +124,7 @@ class Query extends BaseQuery{
 
 		}
 
-		$this->_params = $where['params'];
+		$this->_params = $this->_operator->getParams();
 		$this->_syntax = $s;
 
 	}

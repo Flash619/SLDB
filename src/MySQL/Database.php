@@ -27,12 +27,23 @@ class Database extends BaseDatabase{
 
 	}
 
+    /**
+     * Initializes a new query.
+     * @param string|NULL $type Type of query to initialize.
+     * @return Query
+     */
 	function initQuery(string $type=NULL){
 
 		return new MySQLQuery($type);
 
 	}
 
+    /**
+     * Executes the provided query on this database.
+     * @param BaseQuery $query
+     * @throws \SLDB\Exception\InvalidQueryOperatorException
+     * @throws \SLDB\Exception\InvalidQueryTypeException
+     */
 	function execute(BaseQuery &$query){
 
 		if( ! is_a( $query, MySQLQuery ) ){
