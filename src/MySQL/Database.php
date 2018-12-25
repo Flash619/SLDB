@@ -47,7 +47,7 @@ class Database extends BaseDatabase{
 	function execute(BaseQuery &$query){
 
 		if( ! is_a( $query, MySQLQuery ) ){
-			throw new \Exception("Query supplied does not match database type.");
+			throw new \Exception("Database::execute failed. Query supplied does not match database type.");
 		}
 
 		$query->generate();

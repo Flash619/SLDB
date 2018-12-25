@@ -593,7 +593,7 @@ class Query{
 
     		}catch( \Exception $e ){
 
-    			throw new InvalidQueryOperatorException("Failed to validate operator. ( ".$e->getMessage()." )");
+    			throw new InvalidQueryOperatorException("Query::generate Failed. Failed to validate operator. ( ".$e->getMessage()." )");
 
     		}
 
@@ -620,7 +620,7 @@ class Query{
 				$this->generateDropSyntax();
                 return $this;
 			default:
-				throw new InvalidQueryTypeException();
+				throw new InvalidQueryTypeException("Query::generate failed. Unknown query type '" . $this->_type . "'.");
 		}
 
 	}

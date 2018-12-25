@@ -47,7 +47,7 @@ class Operator{
 
 		}else{
 
-			throw new InvalidOperatorArgumentsException();
+			throw new InvalidOperatorArgumentsException('Operator::__construct expects parameter 1 to be a string.');
 
 		}
 
@@ -61,7 +61,7 @@ class Operator{
 
 		}else{
 
-			throw new InvalidOperatorArgumentsException();
+			throw new InvalidOperatorArgumentsException('Operator::__construct expects parameter 2 to be a mixed array of Condition or Operator objects.');
 
 		}
 
@@ -217,7 +217,7 @@ class Operator{
             }
 
             if(! $tableExists ) {
-                throw new InvalidOperatorArgumentsException("Condition table '" . $condition->getTable() . "' does not exist within query.");
+                throw new InvalidOperatorArgumentsException("Operator::validate failed. Condition table '" . $condition->getTable() . "' does not exist within query.");
             }
 
 		}
@@ -240,13 +240,13 @@ class Operator{
 
 				if(! is_a( $v, 'SLDB\Base\Operator' ) ){
 
-					throw new InvalidOperatorArgumentsException();
+					throw new InvalidOperatorArgumentsException('Operator::validateConditions expects argument 1 to be a mixed array of Condition or Operator objects.');
 
 				}
 
 				if(! $this->validateConditions( $v ) ){
 
-					throw new InvalidOperatorArgumentsException();
+					throw new InvalidOperatorArgumentsException('Operator::validateConditions failed to validate condition.');
 
 				}
 
