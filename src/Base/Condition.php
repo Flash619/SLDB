@@ -118,7 +118,7 @@ class Condition{
     /**
      * Sets the table name this condition should apply to.
      * @param string $table The table this condition should apply to.
-     * @return Condition This condition.
+     * @return $this
      */
     protected function setTable(string $table=NULL){
 
@@ -130,7 +130,7 @@ class Condition{
     /**
      * Sets the field name this condition should apply to.
      * @param string $field The field name this condition should apply to.
-     * @return Condition This condition.
+     * @return $this
      */
     protected function setField(string $field=NULL){
 
@@ -142,7 +142,7 @@ class Condition{
     /**
      * Sets the type of condition that should apply to this condition.
      * @param string $type The type of condition that should apply to this condition.
-     * @return Condition This condition.
+     * @return $this
      */
     protected function setType(string $type=NULL){
 
@@ -154,7 +154,7 @@ class Condition{
     /**
      * Sets the value this condition should use as reference when making comparisons.
      * @param string $value The value this condition should use when making comparisons.
-     * @return Condition This condition.
+     * @return $this
      */
     protected function setValue(string $value=NULL){
 
@@ -166,8 +166,13 @@ class Condition{
     /**
      * Generates the syntax for this condition, hydrating this conditions
      * syntax property.
+     * @return $this
      */
-    public function generate(){}
+    public function generate(){
+
+        return $this;
+
+    }
 
 
 }

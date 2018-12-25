@@ -11,9 +11,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 namespace SLDB;
 
-use SLDB\Base\Query as BaseQuery;
-use SLDB\Base\Database as BaseDatabase;
 use SLDB\MySQL\Database as MySQLDatabase;
+use SLDB\Exception\InvalidConfigurationException;
 
 class SLDB{
 
@@ -66,6 +65,7 @@ class SLDB{
 
 		}
 
+
 	}
 
 	/**
@@ -77,9 +77,8 @@ class SLDB{
 	* Imports a configuration array to SLDB and verifies the accuracy of configuration keys
 	* as well as sets up required classes/variables within SLDS to match the supplied
 	* configuration options.
-	* @since 1.0.0
 	* @param array
-	* @throws InvalidConfigurationExceiption
+	* @throws InvalidConfigurationException
 	*/
 	private function setConfig(array $config){
 
@@ -127,98 +126,36 @@ class SLDB{
 
 	}
 
-	function getDatabase(){
+    /**
+     * Returns the database used by this SLDB instance.
+     * @return Database
+     */
+	public function getDatabase(){
 
 		return $this->_database;
 
 	}
 
-	function select(string $table=NULL,array $fields=NULL,array $operator=NULL,int $limit=NULL,int $offset=NULL){
-		
-		if( $table === NULL || $fields === NULL ){return NULL;}
+    /**
+     * Returns a new query object by calling the databases initQuery function.
+     * This is shorthand for SLDB->getDatabase()->initQuery();
+     * @return Query
+     */
+	public function initQuery(){
 
-		$query = $this->_database->initQuery(QueryType::SELECT);
+	    return $this->_database->initQuery();
 
-		$query->setTable($table);
-		$query->setFields($fields);
-		$query->setOperator($operator);
-		$query->setLimit($limit);
-		$query->setOffset($offset);
+    }
 
-		$query->generate();
+    /**
+     * Executes the provided query on the database used by this instance.
+     * This is shorthand for SLDB->getDatabase()->execute();
+     * @param Query $query
+     */
+    public function execute(Query $query){
 
-		$result = $this->_database->execute($query);
+	    $this->_database->execute($query);
 
-		return $result;
-
-	}
-
-	function update(string $table=NULL,array $values=NULL,array $operator=NULL,int $limit=NULL){
-
-		if( $table === NULL || $values === NULL || $conditions === NULL ){return NULL;}
-
-		$query = $this->_database->initQuery(QueryType::UPDATE);
-
-		$query->setTable($table);
-		$query->setValues($values);
-		$query->setOperator($operator);
-		$query->setLimit($limit);
-
-		$query->generate();
-
-		$result = $this->_database->execute($query);
-
-		return $result;
-
-	}
-
-	function insert(string $table=NULL,array $values=NULL){
-
-		if( $table === NULL || $values === NULL ){return NULL;}
-
-		$query = $this->_database->initQuery(QueryType::INSERT);
-
-		$query->setTable($table);
-		$query->setValues($values);
-
-		$query->generate();
-
-		$result = $this->_database->execute($query);
-
-		return $result;
-
-	}
-
-	function delete(string $table=NULL,array $operator=NULL,int $limit=NULL){
-
-		if( $table === NULL ){return NULL;}
-
-		$query = $this->_database->initQuery(QueryType::DELETE);
-
-		$query->setTable($table);
-		$query->setOperator($operator);
-		$query->setLimit($limit);
-
-		$query->generate();
-
-		$result = $this->_database->execute($query);
-
-		return $result;
-
-	}
-
-	function create(){
-
-		throw new FunctionNotYetSupportedException();
-
-	}
-
-	function drop(){
-
-		throw new FunctionNotYetSupportedException();
-
-	}
+    }
 
 }
-class InvalidConfigurationException extends \Exception{}
-class FunctionNotYetSupportedException extends \Exception{}

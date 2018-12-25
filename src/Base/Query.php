@@ -2,6 +2,7 @@
 
 namespace SLDB\base;
 
+use SLDB\Exception\InvalidOperatorArgumentsException;
 use SLDB\Exception\InvalidQueryFieldException;
 use SLDB\Exception\InvalidQueryTypeException;
 use SLDB\Exception\InvalidQueryOperatorException;
@@ -131,11 +132,11 @@ class Query{
 	* @param array $fields An array of field names to reference or retrieve.
 	* @param string $table (Optional) Name of joined table who's fields should be set. If this value is not provided, it
     * will be assumed all fields belong to the primary selected table.
-	* @return Query This query.
+	* @return $this
     * @throws InvalidQueryFieldException
     * @throws InvalidQueryTypeException
 	*/
-	function select(array $fields, string $table=NULL){
+	public function select(array $fields, string $table=NULL){
 
         if( $this->_table === NULL ){
 
@@ -212,10 +213,9 @@ class Query{
 	/**
 	* Sets the values to be assigned in this query to the provided array of field names and values.
 	* @param array $values An array of field names and values to be assigned in this query.
-	* @return Query This query.
-    * @throws InvalidQueryTypeException
+	* @return $this
 	*/
-	function set(array $values){
+	public function set(array $values){
 
 		$this->_set = $values;
 		return $this;
@@ -228,7 +228,7 @@ class Query{
      * @return $this
      * @throws InvalidQueryTypeException
      */
-	function delete($table=NULL){
+	public function delete($table=NULL){
 
         if( $table !== NULL ){
 
@@ -248,7 +248,7 @@ class Query{
      * @return $this
      * @throws InvalidQueryTypeException
      */
-    function insert($table=NULL){
+    public function insert($table=NULL){
 
 	    if( $table !== NULL ){
 
@@ -268,7 +268,7 @@ class Query{
      * @return $this
      * @throws InvalidQueryTypeException
      */
-    function update($table=NULL){
+    public function update($table=NULL){
 
         if( $table !== NULL ){
 
@@ -285,9 +285,9 @@ class Query{
 	/**
 	* Sets the tables to join for this query. This is useful for MySQL or PostgreSQL when joining multiple tables for a single query.
 	* @param Join $join Tables name to join.
-	* @return Query This query.
+	* @return $this
 	*/
-	function join(Join $join){
+	public function join(Join $join){
 
 	    $this->_join[] = $join;
 
@@ -317,7 +317,7 @@ class Query{
      * @param string $table
      * @return $this
      */
-    function setTable(string $table){
+    public function setTable(string $table){
 
         // If we are switching tables, clear out the old table.
         if( $this->_table !== NULL ){
@@ -334,14 +334,25 @@ class Query{
 
 	/**
 	* Sets the operator in this query to the operator provided.
-	* @param Operator $operator The operator to use in this query.
-	* @return Query This query.
+	* @param Operator|Condition $where The operator to use in this query.
+	* @return $this
+    * @throws InvalidQueryOperatorException
+    * @throws InvalidOperatorArgumentsException
 	*/
-	function setOperator(Operator $operator){
+	public function where($where){
 
-		//Operator validation is ran from Query::generate() as Operator validation requires all other parameters first.
+        if( is_a($where, 'SLDB\Base\Condition') ){
 
-		$this->_operator = $operator;
+            $where = $this->initOperator(Operator::AND_OPERATOR,array(new Condition($where->getTable(), $where->getField(), $where->getType(), $where->getValue())));
+
+        }else if(! is_a($where, 'SLDB\Base\Operator') ){
+
+            throw new InvalidQueryOperatorException('Query::where expects parameter 1 to be a Condition or Operator.');
+
+        }
+
+		$this->_operator = $where;
+
 		return $this;
 
 	}
@@ -350,9 +361,9 @@ class Query{
 	* Sets the limit of rows this query should affect. This value is only honored if the database and query
 	* type supports limits.
 	* @param int $limit The number of rows this query should affect.
-	* @return Query This query.
+	* @return $this
 	*/
-	function limit(int $limit){
+	public function limit(int $limit){
 
 		$this->_limit = $limit;
 		return $this;
@@ -362,9 +373,9 @@ class Query{
 	/**
 	* Sets the ammount of rows that this query should be offset by. This value is only honored if the database and query type supports offsets. 
 	* @param int $offset The ammount of rows this query should be offset by.
-	* @return Query This query.
+	* @return $this
 	*/
-	function offset(int $offset){
+	public function offset(int $offset){
 
 		$this->_offset = $offset;
 		return $this;
@@ -374,9 +385,9 @@ class Query{
 	/**
 	* Sets what type of query this is. This value is one of SELECT, INSERT, UPDATE, DELETE, CREATE, DROP constants stored within the SLDB\Base\Query object.
 	* @param string $type The Query constant that referrs to this queries type.
-	* @return Query
+	* @return $this
 	*/
-	function type(string $type){
+	public function type(string $type){
 
 		// Query type validation is handled by the Query::generate() function within the primary switch statement.
 
@@ -387,9 +398,9 @@ class Query{
 
 	/**
 	* Returns the array of rows returned from this query. This is only useful for select queries.
-	* @return int Array
+	* @return int
 	*/
-	function getRowsReturned(){
+	public function getRowsReturned(){
 
 		return $this->_rows_returned;
 
@@ -399,7 +410,7 @@ class Query{
 	* Returns the number of rows affected by this query. 
 	* @return int
 	*/
-	function getRowsAffected(){
+	public function getRowsAffected(){
 
 		return $this->_rows_affected;
 
@@ -409,7 +420,7 @@ class Query{
 	* Returns the error stored within this query if an error was encounted during execution.
 	* @return string|NULL
 	*/
-	function getError(){
+	public function getError(){
 
 		return $this->_error;
 
@@ -419,7 +430,7 @@ class Query{
 	* Returns the database output message collected during execution if one was stored. 
 	* @return string|NULL
 	*/
-	function getMessage(){
+	public function getMessage(){
 
 		return $this->_message;
 
@@ -429,7 +440,7 @@ class Query{
 	* Returns the type of query this query is. This value is compared using the defined type constants within SLDB\Base\Query.
 	* @return string
 	*/
-	function getType(){
+	public function getType(){
 
 		return $this->_type;
 
@@ -439,7 +450,7 @@ class Query{
 	* Returns the database type that this query is designed to be compatible with. This value is compared using the defined constants within SLDB\Base\Database.
 	* @return string
 	*/
-	function getDatabaseType(){
+	public function getDatabaseType(){
 
 		return $this->_database_type;
 
@@ -449,7 +460,7 @@ class Query{
 	* Returns the table or collection name this query is set to target. 
 	* @return string
 	*/
-	function getTable(){
+	public function getTable(){
 
 		return $this->_table;
 
@@ -459,7 +470,7 @@ class Query{
 	* Returns the joined tables for this query as an array.
 	* @return array[Join]
 	*/
-	function getJoinedTables(){
+	public function getJoinedTables(){
 
 		return $this->_join;
 
@@ -469,7 +480,7 @@ class Query{
 	* Returns the syntax generated by this query after using the Query::generate() function. 
 	* @return string
 	*/
-	function getSyntax(){
+	public function getSyntax(){
 
 		return $this->_syntax;
 
@@ -479,7 +490,7 @@ class Query{
 	* Returns an array of parameters to be bound during execution in reference to the query syntax generated by this query.
 	* @return array
 	*/
-	function getParams(){
+	public function getParams(){
 
 		return $this->_params;
 
@@ -489,7 +500,7 @@ class Query{
 	* Returns the array of field names and values stored within this query to be assigned during execution.
 	* @return array
 	*/
-	function getValues(){
+	public function getValues(){
 
 		return $this->_set;
 
@@ -499,7 +510,7 @@ class Query{
 	* Returns the operator to be used during execution of this query.
 	* @return Operator
 	*/
-	function getOperator(){
+	public function getOperator(){
 
 		return $this->_operator;
 
@@ -509,7 +520,7 @@ class Query{
 	* Returns true if this query has a error stored from during execution. Otherwise false is returned. 
 	* @return boolean
 	*/
-	function hasError(){
+	public function hasError(){
 
 		if( $this->_error !== NULL ){
 
@@ -525,7 +536,7 @@ class Query{
 	* Returns true if this query has a message stored from during execution. Otherwise false is returned. 
 	* @return boolean
 	*/
-	function hasMessage(){
+	public function hasMessage(){
 
 		if( $this->_message !== NULL ){
 
@@ -537,13 +548,40 @@ class Query{
 	}
 
     /**
+     * Initializes and returns a new operator of the appropriate database type for this query.
+     * @param string|NULL $type The type of comparison this operator uses.
+     * @param array|NULL $conditions The conditions this operator will compare.
+     * @return Operator
+     * @throws InvalidOperatorArgumentsException
+     */
+	public function initOperator(string $type=NULL,array $conditions=NULL){
+
+	    return new Operator($type,$conditions);
+
+    }
+
+    /**
+     * Initializes and returns a new condition of the appropriate database type for this query.
+     * @param string|NULL $table Table this conditions field belongs to.
+     * @param string|NULL $field Field this condition applies to.
+     * @param string|NULL $type Type of condition to apply.
+     * @param string|NULL $value The value this field must validate to depending on the provided condition type.
+     * @return Condition
+     */
+    public function initCondition($table,$field,$type,$value){
+
+        return new Condition($table,$field,$type,$value);
+
+    }
+
+    /**
      * Generates the syntax for this query based on all parameters stored within this query. This function will also
      * populate the internal params array to be used during execution in reference to the syntax string stored within
      * this query.
      * @throws InvalidQueryOperatorException
      * @throws InvalidQueryTypeException
      */
-    function generate(){
+    public function generate(){
 
     	// Not all query types use operators.
     	if( $this->_type !== self::INSERT && $this->_type !== self::CREATE ){
@@ -565,22 +603,22 @@ class Query{
 		switch($this->_type){
 			case self::SELECT:
 				$this->generateSelectSyntax();
-				break;
+				return $this;
 			case self::UPDATE:
 				$this->generateUpdateSyntax();
-				break;
+                return $this;
 			case self::INSERT:
 				$this->generateInsertSyntax();
-				break;
+                return $this;
 			case self::DELETE:
 				$this->generateDeleteSyntax();
-				break;
+                return $this;
 			case self::CREATE:
 				$this->generateCreateSyntax();
-				break;
+                return $this;
 			case self::DROP:
 				$this->generateDropSyntax();
-				break;
+                return $this;
 			default:
 				throw new InvalidQueryTypeException();
 		}

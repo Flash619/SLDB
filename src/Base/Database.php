@@ -41,12 +41,11 @@ class Database{
 
     /**
      * Initializes a new query.
-     * @param string|NULL $type Type of query to initialize.
      * @return Query
      */
-	function initQuery(string $type=NULL){
+	function initQuery(){
 
-		return new Query($type);
+		return new Query();
 
 	}
 

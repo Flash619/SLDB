@@ -4,17 +4,18 @@ namespace SLDB\mysql;
 
 use SLDB\Base\Query    as BaseQuery;
 use SLDB\Base\Database as BaseDatabase;
+use SLDB\Exception\InvalidQueryOperatorException;
+use SLDB\Exception\InvalidOperatorArgumentsException;
 
 class Query extends BaseQuery{
 
 	/**
 	* Class Constructor
 	*/
-	function __construct(string $type=NULL){
+	function __construct(){
 
-		BaseQuery::__construct($type);
-
-		$this->_database_type = BaseDatabase::MYSQL;
+        BaseQuery::__construct();
+        $this->_database_type = BaseDatabase::MYSQL;
 
 	}
 
@@ -26,6 +27,56 @@ class Query extends BaseQuery{
 		BaseQuery::__destruct();
 
 	}
+
+    /**
+     * Sets the operator in this query to the operator provided.
+     * @param Operator|Condition $where The operator to use in this query.
+     * @return $this
+     * @throws InvalidQueryOperatorException
+     */
+    public function where($where){
+
+        if( is_a($where, 'SLDB\Base\Condition') ){
+
+            $where = $this->initOperator(Operator::AND_OPERATOR,array(new Condition($where->getTable(), $where->getField(), $where->getType(), $where->getValue())));
+
+        }else if(! is_a($where, 'SLDB\Base\Operator') ){
+
+            throw new InvalidQueryOperatorException('Query::where expects parameter 1 to be a Condition or Operator.');
+
+        }
+
+        $this->_operator = $where;
+
+        return $this;
+
+    }
+
+    /**
+     * Initializes and returns a new operator of the appropriate database type for this query.
+     * @param string|NULL $type The type of comparison this operator uses.
+     * @param array|NULL $conditions The conditions this operator will compare.
+     * @return Operator
+     */
+    public function initOperator(string $type=NULL,array $conditions=NULL){
+
+        return new Operator($type,$conditions);
+
+    }
+
+    /**
+     * Initializes and returns a new condition of the appropriate database type for this query.
+     * @param string|NULL $table Table this conditions field belongs to.
+     * @param string|NULL $field Field this condition applies to.
+     * @param string|NULL $type Type of condition to apply.
+     * @param string|NULL $value The value this field must validate to depending on the provided condition type.
+     * @return Condition
+     */
+    public function initCondition($table,$field,$type,$value){
+
+        return new Condition($table,$field,$type,$value);
+
+    }
 
 	protected function generateSelectSyntax(){
 

@@ -29,7 +29,7 @@ To contribute, make a local copy of SLDB by forking our Git repository, make whi
 
 Bug Reporting
 -------------
-To submit a bug report, please submit a new issue to out GitLab repository. Issues will be evaluated in the order they are received. Before submitting an issue, be sure to search as someone may have already submitted an issue for the same bug.
+To submit a bug report, please submit a new issue to out GitLab repository. Issues will be evaluated in the order they are received. Before submitting an issue, be sure to search as someone may have already submitted an issue for the same problem.
 
 
 Indices and tables

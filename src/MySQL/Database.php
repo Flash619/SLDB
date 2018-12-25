@@ -8,9 +8,10 @@ use SLDB\MySQL\Query   as MySQLQuery;
 
 class Database extends BaseDatabase{
 
-	/**
-	* Class Constructor
-	*/
+    /**
+     * Database constructor.
+     * @param array|NULL $config
+     */
 	function __construct(array $config=NULL){
 
 		BaseDatabase::__construct($config);
@@ -29,12 +30,11 @@ class Database extends BaseDatabase{
 
     /**
      * Initializes a new query.
-     * @param string|NULL $type Type of query to initialize.
      * @return Query
      */
-	function initQuery(string $type=NULL){
+	function initQuery(){
 
-		return new MySQLQuery($type);
+		return new MySQLQuery();
 
 	}
 
@@ -51,6 +51,8 @@ class Database extends BaseDatabase{
 		}
 
 		$query->generate();
+
+		// TODO PDO Query execution.
 
 	}
 

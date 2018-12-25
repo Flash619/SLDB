@@ -24,11 +24,11 @@ class MySQLQueryTest extends TestCase{
 
  		$query = new Query();
 
- 		$query->select(array('id','name','quantity'),'test_table')->setOperator(new Operator(
+ 		$query->select(array('id','name','quantity'),'test_table')->where($query->initOperator(
  			Operator::AND_OPERATOR,
  			array(
- 				new Condition('test_table','color',Condition::NOT_EQUAL_TO,'blue'),
- 				new Condition('test_table','size',Condition::GREATER_THAN,'20'),
+ 				$query->initCondition('test_table','color',Condition::NOT_EQUAL_TO,'blue'),
+                $query->initCondition('test_table','size',Condition::GREATER_THAN,'20'),
  			)
  		))->limit(15)->offset(15)->generate();
 
@@ -56,27 +56,27 @@ class MySQLQueryTest extends TestCase{
  			),
             'test_table'
  		)
- 		->join(new Join(Join::INNER_JOIN,'test_table_b','id','test_table', 'id')) // Join test_table_b on test_table_b.id = test_table.id.
-        ->join(new Join(Join::INNER_JOIN,'test_table_c','condition','test_table_b', 'condition')) // Join test_table_c on test_table_c.condition = test_table_b.condition.
+ 		->join(new Join(Join::INNER_JOIN,'test_table_b','id','test_table', 'id'))
+        ->join(new Join(Join::INNER_JOIN,'test_table_c','condition','test_table_b', 'condition'))
  		->select(
  			array(
  				'id',
  				'color',
  				'size',
  				'condition',
- 			),  'test_table_b' // Fetch from joined test_table_b 'b'.
+ 			),  'test_table_b'
  		)->select(
  			array(
  				'id',
  				'color',
  				'condition'
- 			),  'test_table_c' // Fetch from joined test_table_c 'c'.
- 		)->setOperator(new Operator(
+ 			),  'test_table_c'
+ 		)->where($query->initOperator(
  			Operator::AND_OPERATOR,
  			array(
- 				new Condition('test_table_c','color',Condition::NOT_EQUAL_TO,'blue'),
- 				new Condition('test_table_b','size',Condition::GREATER_THAN,'20'),
- 				new Condition('test_table_c','condition',Condition::LIKE,'good') // test_table_c.condition LIKE good.
+ 				$query->initCondition('test_table_c','color',Condition::NOT_EQUAL_TO,'blue'),
+                $query->initCondition('test_table_b','size',Condition::GREATER_THAN,'20'),
+                $query->initCondition('test_table_c','condition',Condition::LIKE,'good') // test_table_c.condition LIKE good.
  			)
  		))->limit(15)->offset(15)->generate();
 
@@ -118,12 +118,12 @@ class MySQLQueryTest extends TestCase{
 
  		$query = new Query();
 
- 		$query->delete('test_table')->setOperator(new Operator(
+ 		$query->delete('test_table')->where($query->initOperator(
  			Operator::AND_OPERATOR,
  			array(
- 				new Condition('test_table','color',Condition::EQUAL_TO,'blue'),
- 				new Condition('test_table','size',Condition::EQUAL_TO,'small'),
- 				new Condition('test_table','quantity',Condition::LESS_THAN,20),
+ 				$query->initCondition('test_table','color',Condition::EQUAL_TO,'blue'),
+                $query->initCondition('test_table','size',Condition::EQUAL_TO,'small'),
+                $query->initCondition('test_table','quantity',Condition::LESS_THAN,20),
  			)
  		))->limit(1)->generate();
 
@@ -145,12 +145,9 @@ class MySQLQueryTest extends TestCase{
  		$query->update('test_table')->set(array(
  			'color'    => 'red',
  			'quantity' => 20,
- 		))->setOperator(new Operator(
- 			Operator::AND_OPERATOR,
- 			array(
- 				new Condition('test_table','id',Condition::EQUAL_TO,10),
- 			)
- 		))->limit(1)->generate();
+ 		))->where(
+ 		    $query->initCondition('test_table','id',Condition::EQUAL_TO,10)
+        )->limit(1)->generate();
 
  		$a = "UPDATE test_table SET color = ?,quantity = ? WHERE id = ? LIMIT 1";
 
