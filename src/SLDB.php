@@ -155,6 +155,32 @@ class SLDB
     }
 
     /**
+     * Returns a new query object by calling the databases initQuery function.
+     * This is shorthand for SLDB->getDatabase()->initCondition();
+     * @param $args
+     * @return Condition
+     */
+    public function initCondition(...$args)
+    {
+
+        return $this->_database->initQuery()->initCondition(...$args);
+
+    }
+
+    /**
+     * Returns a new query object by calling the databases initQuery function.
+     * This is shorthand for SLDB->getDatabase()->initOperator();
+     * @param $args
+     * @return Operator
+     */
+    public function initOperator(...$args)
+    {
+
+        return $this->_database->initQuery()->initOperator(...$args);
+
+    }
+
+    /**
      * Executes the provided query on the database used by this instance.
      * This is shorthand for SLDB->getDatabase()->execute();
      * @param Query $query

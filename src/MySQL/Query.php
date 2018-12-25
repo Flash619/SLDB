@@ -1,6 +1,6 @@
 <?php
 
-namespace SLDB\mysql;
+namespace SLDB\MySQL;
 
 use SLDB\Base\Database as BaseDatabase;
 use SLDB\Base\Query as BaseQuery;
@@ -57,29 +57,25 @@ class Query extends BaseQuery
 
     /**
      * Initializes and returns a new operator of the appropriate database type for this query.
-     * @param string|NULL $type The type of comparison this operator uses.
-     * @param array|NULL $conditions The conditions this operator will compare.
+     * @param $args
      * @return Operator
      */
-    public function initOperator(string $type = NULL, array $conditions = NULL)
+    public function initOperator(...$args)
     {
 
-        return new Operator($type, $conditions);
+        return new Operator(...$args);
 
     }
 
     /**
      * Initializes and returns a new condition of the appropriate database type for this query.
-     * @param string|NULL $table Table this conditions field belongs to.
-     * @param string|NULL $field Field this condition applies to.
-     * @param string|NULL $type Type of condition to apply.
-     * @param string|NULL $value The value this field must validate to depending on the provided condition type.
+     * @param $args
      * @return Condition
      */
-    public function initCondition($table, $field, $type, $value)
+    public function initCondition(...$args)
     {
 
-        return new Condition($table, $field, $type, $value);
+        return new Condition(...$args);
 
     }
 
