@@ -1,163 +1,170 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use SLDB\MySQL\Database as Database;
-use SLDB\MySQL\Query as Query;
-use SLDB\MySQL\Join as Join;
 use SLDB\MySQL\Condition;
+use SLDB\MySQL\Database as Database;
+use SLDB\MySQL\Join as Join;
 use SLDB\MySQL\Operator;
+use SLDB\MySQL\Query as Query;
 
-class MySQLQueryTest extends TestCase{
+class MySQLQueryTest extends TestCase
+{
 
- 	function testInitializeObject(){
+    function testInitializeObject()
+    {
 
- 		$db = new Database();
- 		$query = $db->initQuery();
+        $db = new Database();
+        $query = $db->initQuery();
 
- 		$this->AssertFalse((! is_a($query, 'SLDB\MySQL\Query')),"Failed to initialize MySQL Database object.");
- 		$this->AssertEquals(NULL,$query->getType(),"Database queryInit() returned invalid object.");
- 		$this->AssertEquals(Database::MYSQL,$query->getDatabaseType(),"Database queryInit() returned Query with invalid database type.");
+        $this->AssertFalse((!is_a($query, 'SLDB\MySQL\Query')), "Failed to initialize MySQL Database object.");
+        $this->AssertEquals(NULL, $query->getType(), "Database queryInit() returned invalid object.");
+        $this->AssertEquals(Database::MYSQL, $query->getDatabaseType(), "Database queryInit() returned Query with invalid database type.");
 
- 	}
+    }
 
- 	function testMySQLSelectQuery(){
+    function testMySQLSelectQuery()
+    {
 
- 		$query = new Query();
+        $query = new Query();
 
- 		$query->select(array('id','name','quantity'),'test_table')->where($query->initOperator(
- 			Operator::AND_OPERATOR,
- 			array(
- 				$query->initCondition('test_table','color',Condition::NOT_EQUAL_TO,'blue'),
-                $query->initCondition('test_table','size',Condition::GREATER_THAN,'20'),
- 			)
- 		))->limit(15)->offset(15)->generate();
+        $query->select(array('id', 'name', 'quantity'), 'test_table')->where($query->initOperator(
+            Operator::AND_OPERATOR,
+            array(
+                $query->initCondition('test_table', 'color', Condition::NOT_EQUAL_TO, 'blue'),
+                $query->initCondition('test_table', 'size', Condition::GREATER_THAN, '20'),
+            )
+        ))->limit(15)->offset(15)->generate();
 
- 		$a = "SELECT test_table.id,test_table.name,test_table.quantity FROM test_table WHERE color != ? AND size > ? LIMIT 15 OFFSET 15";
+        $a = "SELECT test_table.id,test_table.name,test_table.quantity FROM test_table WHERE color != ? AND size > ? LIMIT 15 OFFSET 15";
 
- 		$b = $query->getSyntax();
- 		$p = $query->getParams();
+        $b = $query->getSyntax();
+        $p = $query->getParams();
 
- 		$this->AssertEquals($a,$b,"Generated query syntax did not match expected query syntax.");
- 		$this->AssertEquals(2,count($p),"Param count did not equal expected return count.");
- 		$this->AssertEquals("blue",$p[0],"Expected param did not match actual param returned.");
- 		$this->AssertEquals("20",$p[1],"Expected param did not match actual param returned.");
+        $this->AssertEquals($a, $b, "Generated query syntax did not match expected query syntax.");
+        $this->AssertEquals(2, count($p), "Param count did not equal expected return count.");
+        $this->AssertEquals("blue", $p[0], "Expected param did not match actual param returned.");
+        $this->AssertEquals("20", $p[1], "Expected param did not match actual param returned.");
 
- 	}
+    }
 
- 	function testMySQLSelectJoinQuery(){
+    function testMySQLSelectJoinQuery()
+    {
 
- 		$query = new Query();
+        $query = new Query();
 
- 		$query->select(
- 			array(
- 				'id',
- 				'name',
- 				'quantity'
- 			),
+        $query->select(
+            array(
+                'id',
+                'name',
+                'quantity'
+            ),
             'test_table'
- 		)
- 		->join(new Join(Join::INNER_JOIN,'test_table_b','id','test_table', 'id'))
-        ->join(new Join(Join::INNER_JOIN,'test_table_c','condition','test_table_b', 'condition'))
- 		->select(
- 			array(
- 				'id',
- 				'color',
- 				'size',
- 				'condition',
- 			),  'test_table_b'
- 		)->select(
- 			array(
- 				'id',
- 				'color',
- 				'condition'
- 			),  'test_table_c'
- 		)->where($query->initOperator(
- 			Operator::AND_OPERATOR,
- 			array(
- 				$query->initCondition('test_table_c','color',Condition::NOT_EQUAL_TO,'blue'),
-                $query->initCondition('test_table_b','size',Condition::GREATER_THAN,'20'),
-                $query->initCondition('test_table_c','condition',Condition::LIKE,'good') // test_table_c.condition LIKE good.
- 			)
- 		))->limit(15)->offset(15)->generate();
+        )
+            ->join(new Join(Join::INNER_JOIN, 'test_table_b', 'id', 'test_table', 'id'))
+            ->join(new Join(Join::INNER_JOIN, 'test_table_c', 'condition', 'test_table_b', 'condition'))
+            ->select(
+                array(
+                    'id',
+                    'color',
+                    'size',
+                    'condition',
+                ), 'test_table_b'
+            )->select(
+                array(
+                    'id',
+                    'color',
+                    'condition'
+                ), 'test_table_c'
+            )->where($query->initOperator(
+                Operator::AND_OPERATOR,
+                array(
+                    $query->initCondition('test_table_c', 'color', Condition::NOT_EQUAL_TO, 'blue'),
+                    $query->initCondition('test_table_b', 'size', Condition::GREATER_THAN, '20'),
+                    $query->initCondition('test_table_c', 'condition', Condition::LIKE, 'good') // test_table_c.condition LIKE good.
+                )
+            ))->limit(15)->offset(15)->generate();
 
- 		$a = "SELECT test_table.id,test_table.name,test_table.quantity,test_table_b.id,test_table_b.color,test_table_b.size,test_table_b.condition,test_table_c.id,test_table_c.color,test_table_c.condition FROM test_table INNER JOIN test_table ON test_table.id = test_table_b.id INNER JOIN test_table_b ON test_table_b.condition = test_table_c.condition  WHERE color != ? AND size > ? AND condition LIKE ? LIMIT 15 OFFSET 15";
+        $a = "SELECT test_table.id,test_table.name,test_table.quantity,test_table_b.id,test_table_b.color,test_table_b.size,test_table_b.condition,test_table_c.id,test_table_c.color,test_table_c.condition FROM test_table INNER JOIN test_table ON test_table.id = test_table_b.id INNER JOIN test_table_b ON test_table_b.condition = test_table_c.condition  WHERE color != ? AND size > ? AND condition LIKE ? LIMIT 15 OFFSET 15";
 
- 		$b = $query->getSyntax();
- 		$p = $query->getParams();
+        $b = $query->getSyntax();
+        $p = $query->getParams();
 
- 		$this->AssertEquals($a,$b,"Generated query syntax did not match expected query syntax.");
- 		$this->AssertEquals(3,count($p),"Param count did not equal expected return count.");
- 		$this->AssertEquals("blue",$p[0],"Expected param did not match actual param returned.");
- 		$this->AssertEquals("20",$p[1],"Expected param did not match actual param returned.");
+        $this->AssertEquals($a, $b, "Generated query syntax did not match expected query syntax.");
+        $this->AssertEquals(3, count($p), "Param count did not equal expected return count.");
+        $this->AssertEquals("blue", $p[0], "Expected param did not match actual param returned.");
+        $this->AssertEquals("20", $p[1], "Expected param did not match actual param returned.");
 
- 	}
+    }
 
- 	function testMySQLInsertQuery(){
+    function testMySQLInsertQuery()
+    {
 
- 		$query = new Query();
+        $query = new Query();
 
- 		$query->insert('test_table')->set(array(
- 			'name'     => 'red and delicious',
- 			'quantity' => 25,
- 			'color'    => 'red',
- 			'size'     => 'small',
- 		))->generate();
+        $query->insert('test_table')->set(array(
+            'name' => 'red and delicious',
+            'quantity' => 25,
+            'color' => 'red',
+            'size' => 'small',
+        ))->generate();
 
- 		$a = "INSERT INTO test_table (name,quantity,color,size) VALUES (?,?,?,?)";
+        $a = "INSERT INTO test_table (name,quantity,color,size) VALUES (?,?,?,?)";
 
- 		$b = $query->getSyntax();
- 		$p = $query->getParams();
+        $b = $query->getSyntax();
+        $p = $query->getParams();
 
- 		$this->AssertEquals($a,$b,"Generated query syntax did not match expected query syntax.");
- 		$this->AssertEquals(4,count($p),"Param count did not equal expected return count.");
- 		$this->AssertEquals('red and delicious',$p[0],"Expected param did not match actual param returned.");
+        $this->AssertEquals($a, $b, "Generated query syntax did not match expected query syntax.");
+        $this->AssertEquals(4, count($p), "Param count did not equal expected return count.");
+        $this->AssertEquals('red and delicious', $p[0], "Expected param did not match actual param returned.");
 
- 	}
+    }
 
- 	function testMySQLDeleteQuery(){
+    function testMySQLDeleteQuery()
+    {
 
- 		$query = new Query();
+        $query = new Query();
 
- 		$query->delete('test_table')->where($query->initOperator(
- 			Operator::AND_OPERATOR,
- 			array(
- 				$query->initCondition('test_table','color',Condition::EQUAL_TO,'blue'),
-                $query->initCondition('test_table','size',Condition::EQUAL_TO,'small'),
-                $query->initCondition('test_table','quantity',Condition::LESS_THAN,20),
- 			)
- 		))->limit(1)->generate();
+        $query->delete('test_table')->where($query->initOperator(
+            Operator::AND_OPERATOR,
+            array(
+                $query->initCondition('test_table', 'color', Condition::EQUAL_TO, 'blue'),
+                $query->initCondition('test_table', 'size', Condition::EQUAL_TO, 'small'),
+                $query->initCondition('test_table', 'quantity', Condition::LESS_THAN, 20),
+            )
+        ))->limit(1)->generate();
 
- 		$a = "DELETE FROM test_table WHERE color = ? AND size = ? AND quantity < ? LIMIT 1";
+        $a = "DELETE FROM test_table WHERE color = ? AND size = ? AND quantity < ? LIMIT 1";
 
- 		$b = $query->getSyntax();
- 		$p = $query->getParams();
+        $b = $query->getSyntax();
+        $p = $query->getParams();
 
- 		$this->AssertEquals($a,$b,"Generated query syntax did not match expected query syntax.");
- 		$this->AssertEquals(3,count($p),"Param count did not equal expected return count.");
- 		$this->AssertEquals('small',$p[1],"Expected param did not match actual param returned.");
+        $this->AssertEquals($a, $b, "Generated query syntax did not match expected query syntax.");
+        $this->AssertEquals(3, count($p), "Param count did not equal expected return count.");
+        $this->AssertEquals('small', $p[1], "Expected param did not match actual param returned.");
 
- 	}
+    }
 
- 	function testMySQLUpdateQuery(){
+    function testMySQLUpdateQuery()
+    {
 
- 		$query = new Query();
+        $query = new Query();
 
- 		$query->update('test_table')->set(array(
- 			'color'    => 'red',
- 			'quantity' => 20,
- 		))->where(
- 		    $query->initCondition('test_table','id',Condition::EQUAL_TO,10)
+        $query->update('test_table')->set(array(
+            'color' => 'red',
+            'quantity' => 20,
+        ))->where(
+            $query->initCondition('test_table', 'id', Condition::EQUAL_TO, 10)
         )->limit(1)->generate();
 
- 		$a = "UPDATE test_table SET color = ?,quantity = ? WHERE id = ? LIMIT 1";
+        $a = "UPDATE test_table SET color = ?,quantity = ? WHERE id = ? LIMIT 1";
 
- 		$b = $query->getSyntax();
- 		$p = $query->getParams();
+        $b = $query->getSyntax();
+        $p = $query->getParams();
 
- 		$this->AssertEquals($a,$b,"Generated query syntax did not match expected query syntax.");
- 		$this->AssertEquals(3,count($p),"Param count did not equal expected return count.");
- 		$this->AssertEquals(10,$p[2],"Expected param did not match actual param returned.");
+        $this->AssertEquals($a, $b, "Generated query syntax did not match expected query syntax.");
+        $this->AssertEquals(3, count($p), "Param count did not equal expected return count.");
+        $this->AssertEquals(10, $p[2], "Expected param did not match actual param returned.");
 
- 	}
+    }
 
 }

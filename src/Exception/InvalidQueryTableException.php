@@ -2,4 +2,6 @@
 
 namespace SLDB\Exception;
 
-class InvalidQueryTableException extends \Exception{}
+class InvalidQueryTableException extends \Exception
+{
+}

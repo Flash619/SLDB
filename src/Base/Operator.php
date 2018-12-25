@@ -1,17 +1,19 @@
 <?php
 
 namespace SLDB\Base;
+
 use SLDB\Exception\InvalidOperatorArgumentsException;
 
 /**
-* The operator class is used by queries to determine which rows a query should apply to based on field value comparison within stored conditions. Each condition stored within this operator holds a field, value, and condition type. When all conditions match a particular row, that row is affected or selected by the active query. Operators can store a limitless number of conditions. Conditions can also be nested operators as well.
-* When the query is generated, all operators and conditions are parsed into syntax and parameter arrays for the database to use during the query execution. Translation of operators to syntax takes place within the SLDB Query objects of their respective database types.
-*/
-class Operator{
+ * The operator class is used by queries to determine which rows a query should apply to based on field value comparison within stored conditions. Each condition stored within this operator holds a field, value, and condition type. When all conditions match a particular row, that row is affected or selected by the active query. Operators can store a limitless number of conditions. Conditions can also be nested operators as well.
+ * When the query is generated, all operators and conditions are parsed into syntax and parameter arrays for the database to use during the query execution. Translation of operators to syntax takes place within the SLDB Query objects of their respective database types.
+ */
+class Operator
+{
 
-	// Constants used for operator type identification.
-	const AND_OPERATOR = 'AND_OPERATOR';
-	const OR_OPERATOR  = 'OR_OPERATOR';
+    // Constants used for operator type identification.
+    const AND_OPERATOR = 'AND_OPERATOR';
+    const OR_OPERATOR = 'OR_OPERATOR';
 
     /**
      * @var string The type for this operator.
@@ -39,122 +41,126 @@ class Operator{
      * @param array|NULL $conditions The conditions this operator will compare.
      * @throws InvalidOperatorArgumentsException
      */
-	function __construct(string $type=NULL,array $conditions=NULL){
+    function __construct(string $type = NULL, array $conditions = NULL)
+    {
 
-		if( $type !== NULL ){
+        if ($type !== NULL) {
 
-			$this->_type = $type;
+            $this->_type = $type;
 
-		}else{
+        } else {
 
-			throw new InvalidOperatorArgumentsException('Operator::__construct expects parameter 1 to be a string.');
+            throw new InvalidOperatorArgumentsException('Operator::__construct expects parameter 1 to be a string.');
 
-		}
+        }
 
-		if( $conditions !== NULL && count( $conditions ) > 0 ){
+        if ($conditions !== NULL && count($conditions) > 0) {
 
-			if( $this->validateConditions($conditions) ){
+            if ($this->validateConditions($conditions)) {
 
-				$this->_conditions = $conditions;
+                $this->_conditions = $conditions;
 
-			}
+            }
 
-		}else{
+        } else {
 
-			throw new InvalidOperatorArgumentsException('Operator::__construct expects parameter 2 to be a mixed array of Condition or Operator objects.');
+            throw new InvalidOperatorArgumentsException('Operator::__construct expects parameter 2 to be a mixed array of Condition or Operator objects.');
 
-		}
+        }
 
-		$this->_syntax = NULL;
-		$this->_params = array();
+        $this->_syntax = NULL;
+        $this->_params = array();
 
-	}
+    }
 
-	/**
-	* Class Deconstructor
-	*/
-	function __destruct(){}
+    /**
+     * Validates conditions supplied, including nested operators/conditions recursively.
+     * @param array $conditions Conditions to verify.
+     * @return bool
+     * @throws InvalidOperatorArgumentsException
+     */
+    protected function validateConditions(array $conditions)
+    {
 
-	/**
-	* Adds a condition to this operator.
-	* @param Condition SLDB\Operator $condition Condition or operator to add as a condition to this operator.
-	* @return $this
-	* @throws InvalidOperatorArgumentsException
-	*/
-    protected function addCondition($condition){
+        foreach ($conditions as $v) {
 
-		if( $this->validateConditions( array( $condition ) ) ){
+            if (!is_a($v, 'SLDB\Base\Condition')) {
 
-			$this->_conditions[] = $condition;
+                if (!is_a($v, 'SLDB\Base\Operator')) {
 
-		}
+                    throw new InvalidOperatorArgumentsException('Operator::validateConditions expects argument 1 to be a mixed array of Condition or Operator objects.');
 
-		return $this;
+                }
 
-	}
+                if (!$this->validateConditions($v)) {
 
-	/**
-	* Adds a array of conditions to the stored conditions within this operator.
-	* @param array $conditions Conditions to add to this operator.
-	* @return $this
-	* @throws InvalidOperatorArgumentsException
-	*/
-    protected function addConditions(array $conditions){
+                    throw new InvalidOperatorArgumentsException('Operator::validateConditions failed to validate condition.');
 
-		if( $this->validateConditions( $conditions ) ){
+                }
 
-			array_merge( $this->_conditions, $conditions );
+            }
 
-		}
+        }
 
-		return $this;
+        return true;
 
-	}
+    }
 
-	/**
-	* Sets the conditions within this operator the the array of supplied conditions.
-	* @param array $conditions Conditions to use within this operator.
-	* @return $this
-    * @throws InvalidOperatorArgumentsException
-	*/
-    protected function setConditions(array $conditions){
+    /**
+     * Class Deconstructor
+     */
+    function __destruct()
+    {
+    }
 
-		if( $this->validateConditions( $conditions ) ){
+    /**
+     * Returns the array of conditions stored within this operator.
+     * @return array
+     */
+    public function getConditions()
+    {
 
-			$this->_conditions = $conditions;
+        return $this->_conditions;
 
-		}
+    }
 
-		return $this;
+    /**
+     * Sets the conditions within this operator the the array of supplied conditions.
+     * @param array $conditions Conditions to use within this operator.
+     * @return $this
+     * @throws InvalidOperatorArgumentsException
+     */
+    protected function setConditions(array $conditions)
+    {
 
-	}
+        if ($this->validateConditions($conditions)) {
 
-	/**
-	* Returns the array of conditions stored within this operator.
-	* @return array
-	*/
-    public function getConditions(){
+            $this->_conditions = $conditions;
 
-		return $this->_conditions;
+        }
 
-	}
+        return $this;
 
-	/**
-	* Returns the type of operator this operator is.
-	* @return string
-	*/
-    public function getType(){
+    }
 
-		return $this->_type;
+    /**
+     * Returns the type of operator this operator is.
+     * @return string
+     */
+    public function getType()
+    {
 
-	}
+        return $this->_type;
+
+    }
 
     /**
      * Returns the syntax generated by this operator. If
      * generate has not been called, NULL will be returned.
      * @return string
      */
-    public function getSyntax(){
+    public function getSyntax()
+    {
 
         return $this->_syntax;
 
@@ -165,50 +171,52 @@ class Operator{
      * and gathered during the generate call.
      * @return array
      */
-    public function getParams(){
+    public function getParams()
+    {
 
         return $this->_params;
 
     }
 
-	/**
-	* Validates this operator and nested operators insuring that all tables and fields within this operator, are found within the table and field arrays provided to this function.
-	* @param string $table The primary table to be used in a query with this operator.
-	* @param array $joins tables The tables this function should use as reference when validating table and field names.
-	* @param array $fields The fields this function should use as reference when validating table and field names.
-	* @return boolean
-    * @throws InvalidOperatorArgumentsException
-	*/
-    public function validate(string $table,array $joins,array $fields){
+    /**
+     * Validates this operator and nested operators insuring that all tables and fields within this operator, are found within the table and field arrays provided to this function.
+     * @param string $table The primary table to be used in a query with this operator.
+     * @param array $joins tables The tables this function should use as reference when validating table and field names.
+     * @param array $fields The fields this function should use as reference when validating table and field names.
+     * @return boolean
+     * @throws InvalidOperatorArgumentsException
+     */
+    public function validate(string $table, array $joins, array $fields)
+    {
 
         $tableExists = false;
 
-		foreach( $this->_conditions as $condition ){
+        foreach ($this->_conditions as $condition) {
 
-			if( is_a( $condition, 'SLDB\Base\Operator' ) ){
+            if (is_a($condition, 'SLDB\Base\Operator')) {
 
-				if( ! $this->_validate( $joins, $fields ) ){
+                if (!$this->_validate($joins, $fields)) {
 
-					return false;
+                    return false;
 
-				}
+                }
 
-				continue;
+                continue;
 
-			}
+            }
 
-			// Make sure that the Table exists within $tables and $fields if the Table is not NULL. If the table is NULL, the Query object will assume this condition
-			// uses the $primary_table as the reference table during execution.
+            // Make sure that the Table exists within $tables and $fields if the Table is not NULL. If the table is NULL, the Query object will assume this condition
+            // uses the $primary_table as the reference table during execution.
 
-            if( $condition->getTable() === $table ) {
+            if ($condition->getTable() === $table) {
 
                 $tableExists = true;
 
             }
 
-            foreach( $joins as $k => $v ) {
+            foreach ($joins as $k => $v) {
 
-                if ( $v->getForeignTable() === $condition->getTable() ) {
+                if ($v->getForeignTable() === $condition->getTable()) {
 
                     $tableExists = true;
 
@@ -216,56 +224,63 @@ class Operator{
 
             }
 
-            if(! $tableExists ) {
+            if (!$tableExists) {
                 throw new InvalidOperatorArgumentsException("Operator::validate failed. Condition table '" . $condition->getTable() . "' does not exist within query.");
             }
 
-		}
+        }
 
-		return true;
+        return true;
 
-	}
-
-	/**
-	* Validates conditions supplied, including nested operators/conditions recursively.
-	* @param array $conditions Conditions to verify.
-    * @return bool
-	* @throws InvalidOperatorArgumentsException
-	*/
-	protected function validateConditions(array $conditions){
-
-		foreach( $conditions as $v ){
-
-			if(! is_a( $v, 'SLDB\Base\Condition' ) ){
-
-				if(! is_a( $v, 'SLDB\Base\Operator' ) ){
-
-					throw new InvalidOperatorArgumentsException('Operator::validateConditions expects argument 1 to be a mixed array of Condition or Operator objects.');
-
-				}
-
-				if(! $this->validateConditions( $v ) ){
-
-					throw new InvalidOperatorArgumentsException('Operator::validateConditions failed to validate condition.');
-
-				}
-
-			}
-
-		}
-
-		return true;
-
-	}
+    }
 
     /**
      * Generates the syntax for this operator, hydrating this operators syntax and params
      * properties.
      * @return $this
      */
-	public function generate(){
+    public function generate()
+    {
 
-	    return $this;
+        return $this;
+
+    }
+
+    /**
+     * Adds a condition to this operator.
+     * @param Condition SLDB\Operator $condition Condition or operator to add as a condition to this operator.
+     * @return $this
+     * @throws InvalidOperatorArgumentsException
+     */
+    protected function addCondition($condition)
+    {
+
+        if ($this->validateConditions(array($condition))) {
+
+            $this->_conditions[] = $condition;
+
+        }
+
+        return $this;
+
+    }
+
+    /**
+     * Adds a array of conditions to the stored conditions within this operator.
+     * @param array $conditions Conditions to add to this operator.
+     * @return $this
+     * @throws InvalidOperatorArgumentsException
+     */
+    protected function addConditions(array $conditions)
+    {
+
+        if ($this->validateConditions($conditions)) {
+
+            array_merge($this->_conditions, $conditions);
+
+        }
+
+        return $this;
 
     }
 }

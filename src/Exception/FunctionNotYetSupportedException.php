@@ -2,4 +2,6 @@
 
 namespace SLDB\Exception;
 
-class FunctionNotYetSupportedException extends \Exception{}
+class FunctionNotYetSupportedException extends \Exception
+{
+}

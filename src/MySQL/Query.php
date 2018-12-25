@@ -2,31 +2,33 @@
 
 namespace SLDB\mysql;
 
-use SLDB\Base\Query    as BaseQuery;
 use SLDB\Base\Database as BaseDatabase;
+use SLDB\Base\Query as BaseQuery;
 use SLDB\Exception\InvalidQueryOperatorException;
-use SLDB\Exception\InvalidOperatorArgumentsException;
 
-class Query extends BaseQuery{
+class Query extends BaseQuery
+{
 
-	/**
-	* Class Constructor
-	*/
-	function __construct(){
+    /**
+     * Class Constructor
+     */
+    function __construct()
+    {
 
         BaseQuery::__construct();
         $this->_database_type = BaseDatabase::MYSQL;
 
-	}
+    }
 
-	/**
-	* Class Deconstructor
-	*/
-	function __destruct(){
+    /**
+     * Class Deconstructor
+     */
+    function __destruct()
+    {
 
-		BaseQuery::__destruct();
+        BaseQuery::__destruct();
 
-	}
+    }
 
     /**
      * Sets the operator in this query to the operator provided.
@@ -34,13 +36,14 @@ class Query extends BaseQuery{
      * @return $this
      * @throws InvalidQueryOperatorException
      */
-    public function where($where){
+    public function where($where)
+    {
 
-        if( is_a($where, 'SLDB\Base\Condition') ){
+        if (is_a($where, 'SLDB\Base\Condition')) {
 
-            $where = $this->initOperator(Operator::AND_OPERATOR,array(new Condition($where->getTable(), $where->getField(), $where->getType(), $where->getValue())));
+            $where = $this->initOperator(Operator::AND_OPERATOR, array(new Condition($where->getTable(), $where->getField(), $where->getType(), $where->getValue())));
 
-        }else if(! is_a($where, 'SLDB\Base\Operator') ){
+        } else if (!is_a($where, 'SLDB\Base\Operator')) {
 
             throw new InvalidQueryOperatorException('Query::where expects parameter 1 to be a Condition or Operator.');
 
@@ -58,9 +61,10 @@ class Query extends BaseQuery{
      * @param array|NULL $conditions The conditions this operator will compare.
      * @return Operator
      */
-    public function initOperator(string $type=NULL,array $conditions=NULL){
+    public function initOperator(string $type = NULL, array $conditions = NULL)
+    {
 
-        return new Operator($type,$conditions);
+        return new Operator($type, $conditions);
 
     }
 
@@ -72,36 +76,38 @@ class Query extends BaseQuery{
      * @param string|NULL $value The value this field must validate to depending on the provided condition type.
      * @return Condition
      */
-    public function initCondition($table,$field,$type,$value){
+    public function initCondition($table, $field, $type, $value)
+    {
 
-        return new Condition($table,$field,$type,$value);
+        return new Condition($table, $field, $type, $value);
 
     }
 
-	protected function generateSelectSyntax(){
+    protected function generateSelectSyntax()
+    {
 
-		$where = $this->_operator->generate()->getSyntax();
+        $where = $this->_operator->generate()->getSyntax();
 
-		$s = "SELECT ";
+        $s = "SELECT ";
 
-		foreach( $this->_fetch as $k => $v ){
+        foreach ($this->_fetch as $k => $v) {
 
-		    foreach( $v as $f ){
+            foreach ($v as $f) {
 
-		        $s .= $k . '.' . $f . ',';
+                $s .= $k . '.' . $f . ',';
 
             }
 
         }
 
-		$s = rtrim($s,',');
-		$s .= ' FROM '.$this->_table;
+        $s = rtrim($s, ',');
+        $s .= ' FROM ' . $this->_table;
 
-		if( count($this->_join) !== 0 ){
+        if (count($this->_join) !== 0) {
 
-		    $s .= ' ';
+            $s .= ' ';
 
-            foreach( $this->_join as $k => $v ){
+            foreach ($this->_join as $k => $v) {
 
                 $s = $s . $v->getSyntax() . ' ';
 
@@ -109,95 +115,102 @@ class Query extends BaseQuery{
 
         }
 
-		$s .= " WHERE ".$where;
+        $s .= " WHERE " . $where;
 
-		if( $this->_limit !== NULL ){
+        if ($this->_limit !== NULL) {
 
-			$s .= ' LIMIT '.$this->_limit;
+            $s .= ' LIMIT ' . $this->_limit;
 
-		}
+        }
 
-		if( $this->_offset !== NULL ){
+        if ($this->_offset !== NULL) {
 
-			$s .= ' OFFSET '.$this->_offset;
+            $s .= ' OFFSET ' . $this->_offset;
 
-		}
+        }
 
-		$this->_params = $this->_operator->getParams();
+        $this->_params = $this->_operator->getParams();
 
-		$this->_syntax = $s;
+        $this->_syntax = $s;
 
-	}
+    }
 
-	protected function generateUpdateSyntax(){
+    protected function generateUpdateSyntax()
+    {
 
-		$where  = $this->_operator->generate()->getSyntax();
-		$values = array('syntax'=>'','params'=>array());
+        $where = $this->_operator->generate()->getSyntax();
+        $values = array('syntax' => '', 'params' => array());
 
-		foreach( $this->_set as $k => $v ){
+        foreach ($this->_set as $k => $v) {
 
-			$values['syntax']   = $values['syntax'].$k.' = '.'?,';
-			$values['params'][] = $v;
+            $values['syntax'] = $values['syntax'] . $k . ' = ' . '?,';
+            $values['params'][] = $v;
 
-		}
+        }
 
-		$values['syntax'] = rtrim($values['syntax'],',');
+        $values['syntax'] = rtrim($values['syntax'], ',');
 
-		$s = "UPDATE ".$this->_table." SET ".$values['syntax']." WHERE ".$where;
+        $s = "UPDATE " . $this->_table . " SET " . $values['syntax'] . " WHERE " . $where;
 
-		if( $this->_limit !== NULL ){
+        if ($this->_limit !== NULL) {
 
-			$s .= ' LIMIT '.$this->_limit;
+            $s .= ' LIMIT ' . $this->_limit;
 
-		}
+        }
 
-		$this->_params = array_merge($values['params'],$this->_operator->getParams());
-		$this->_syntax = $s;
+        $this->_params = array_merge($values['params'], $this->_operator->getParams());
+        $this->_syntax = $s;
 
-	}
+    }
 
-	protected function generateInsertSyntax(){
+    protected function generateInsertSyntax()
+    {
 
-		$fields = array();
-		$values = array();
-		$vs     = '';
+        $fields = array();
+        $values = array();
+        $vs = '';
 
-		foreach( $this->_set as $k => $v ){
+        foreach ($this->_set as $k => $v) {
 
-			$fields[] = $k;
-			$values[] = $v;
-			$vs       = $vs.'?,';
-			
-		}
+            $fields[] = $k;
+            $values[] = $v;
+            $vs = $vs . '?,';
 
-		$vs = rtrim($vs,',');
+        }
 
-		$s = "INSERT INTO ".$this->_table." (".implode(',',$fields).") VALUES (".$vs.")";
+        $vs = rtrim($vs, ',');
 
-		$this->_syntax = $s;
-		$this->_params = $values;
+        $s = "INSERT INTO " . $this->_table . " (" . implode(',', $fields) . ") VALUES (" . $vs . ")";
 
-	}
+        $this->_syntax = $s;
+        $this->_params = $values;
 
-	protected function generateDeleteSyntax(){
+    }
 
-		$where  = $this->_operator->generate()->getSyntax();
+    protected function generateDeleteSyntax()
+    {
 
-		$s = "DELETE FROM ".$this->_table." WHERE ".$where;
+        $where = $this->_operator->generate()->getSyntax();
 
-		if( $this->_limit !== NULL ){
+        $s = "DELETE FROM " . $this->_table . " WHERE " . $where;
 
-			$s .= ' LIMIT '.$this->_limit;
+        if ($this->_limit !== NULL) {
 
-		}
+            $s .= ' LIMIT ' . $this->_limit;
 
-		$this->_params = $this->_operator->getParams();
-		$this->_syntax = $s;
+        }
 
-	}
+        $this->_params = $this->_operator->getParams();
+        $this->_syntax = $s;
 
-	protected function generateCreateSyntax(){}
+    }
 
-	protected function generateDropSyntax(){}
+    protected function generateCreateSyntax()
+    {
+    }
+
+    protected function generateDropSyntax()
+    {
+    }
 
 }

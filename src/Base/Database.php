@@ -2,85 +2,95 @@
 
 namespace SLDB\Base;
 
-class Database{
+class Database
+{
 
-	const MYSQL      = 'MYSQL';
-	const POSTGRESQL = 'POSTGRESQL';
-	const MONGODB    = 'MONGODB';
+    const MYSQL = 'MYSQL';
+    const POSTGRESQL = 'POSTGRESQL';
+    const MONGODB = 'MONGODB';
 
     /**
      * @var string|NULL The type for this database.
      */
-	protected $_type;
+    protected $_type;
 
     /**
      * @var array The config for this database.
      */
-	protected $_config;
-
-	/**
-	* Class Constructor
-	*/
-	function __construct(array $config=NULL){
-
-		$this->_config = $config;
-		$this->_type = NULL;
-
-	}
-
-	/**
-	* Class Deconstructor
-	*/
-	function __destruct(){}
-
-	function getType(){
-
-		return $this->_type;
-
-	}
+    protected $_config;
 
     /**
-     * Initializes a new query.
-     * @return Query
+     * Class Constructor
      */
-	function initQuery(){
+    function __construct(array $config = NULL)
+    {
 
-		return new Query();
+        $this->_config = $config;
+        $this->_type = NULL;
 
-	}
+    }
 
     /**
-     * Returns true if this database has been configured, otherwise false.
-     * @return bool
+     * Class Deconstructor
      */
-	function isConfigured(){
+    function __destruct()
+    {
+    }
 
-		if( $this->_config === NULL && ! is_array($this->_config) ){
+    function getType()
+    {
 
-			return false;
+        return $this->_type;
 
-		}
-
-		return true;
-
-	}
+    }
 
     /**
      * Sets the database type for this database.
      * @param string $type
      * @return $this
      */
-	protected function setType(string $type){
+    protected function setType(string $type)
+    {
 
-		$this->_type = $type;
-		return $this;
+        $this->_type = $type;
+        return $this;
 
-	}
+    }
+
+    /**
+     * Initializes a new query.
+     * @return Query
+     */
+    function initQuery()
+    {
+
+        return new Query();
+
+    }
+
+    /**
+     * Returns true if this database has been configured, otherwise false.
+     * @return bool
+     */
+    function isConfigured()
+    {
+
+        if ($this->_config === NULL && !is_array($this->_config)) {
+
+            return false;
+
+        }
+
+        return true;
+
+    }
 
     /**
      * Executes the provided query on this database.
      * @param Query $query
      */
-	function execute(Query &$query){}
+    function execute(Query &$query)
+    {
+    }
 
 }

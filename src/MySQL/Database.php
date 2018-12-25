@@ -3,40 +3,44 @@
 namespace SLDB\MySQL;
 
 use SLDB\Base\Database as BaseDatabase;
-use SLDB\Base\Query    as BaseQuery;
-use SLDB\MySQL\Query   as MySQLQuery;
+use SLDB\Base\Query as BaseQuery;
+use SLDB\MySQL\Query as MySQLQuery;
 
-class Database extends BaseDatabase{
+class Database extends BaseDatabase
+{
 
     /**
      * Database constructor.
      * @param array|NULL $config
      */
-	function __construct(array $config=NULL){
+    function __construct(array $config = NULL)
+    {
 
-		BaseDatabase::__construct($config);
-		$this->_type = self::MYSQL;
+        BaseDatabase::__construct($config);
+        $this->_type = self::MYSQL;
 
-	}
+    }
 
-	/**
-	* Class Deconstructor
-	*/
-	function __destruct(){
+    /**
+     * Class Deconstructor
+     */
+    function __destruct()
+    {
 
-		BaseDatabase::__destruct();
+        BaseDatabase::__destruct();
 
-	}
+    }
 
     /**
      * Initializes a new query.
      * @return Query
      */
-	function initQuery(){
+    function initQuery()
+    {
 
-		return new MySQLQuery();
+        return new MySQLQuery();
 
-	}
+    }
 
     /**
      * Executes the provided query on this database.
@@ -44,16 +48,17 @@ class Database extends BaseDatabase{
      * @throws \SLDB\Exception\InvalidQueryOperatorException
      * @throws \SLDB\Exception\InvalidQueryTypeException
      */
-	function execute(BaseQuery &$query){
+    function execute(BaseQuery &$query)
+    {
 
-		if( ! is_a( $query, MySQLQuery ) ){
-			throw new \Exception("Database::execute failed. Query supplied does not match database type.");
-		}
+        if (!is_a($query, MySQLQuery)) {
+            throw new \Exception("Database::execute failed. Query supplied does not match database type.");
+        }
 
-		$query->generate();
+        $query->generate();
 
-		// TODO PDO Query execution.
+        // TODO PDO Query execution.
 
-	}
+    }
 
 }

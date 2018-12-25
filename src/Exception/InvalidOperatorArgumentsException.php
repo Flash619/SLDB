@@ -2,4 +2,6 @@
 
 namespace SLDB\Exception;
 
-class InvalidOperatorArgumentsException extends \Exception{}
+class InvalidOperatorArgumentsException extends \Exception
+{
+}
